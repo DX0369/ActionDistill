@@ -1,6 +1,6 @@
 # Jev 训练项目
 
-更新时间：2026-11-04 14:24 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 ## 研究目标
 
@@ -12,13 +12,13 @@
 
 `outputs/`保存独立命名的样本、ID、模型、评测parts及分析；`tmp/`保存有界验证与未解决诊断。正式样本、权重、指标和人工审查只读，不因代码变化回写。结构化分析可能是当前输入，不能仅因已得结论删除。SampleIndex缓存是可重建派生索引，出错显式停止后按README重建。
 
-迁移冻结池将C1后轨迹去重结果与领域/回复证据分开保存，便携选样只读包内参考和注释。完整池150,234状态、正参考单元150,129状态及105个零参考单元属于不同口径。默认配方、下载、环境和发布使用[迁移说明](../migration/README.md)；完整池已在本机验收；上传、目标机安装与真实GPU验收仍待完成。
+迁移冻结池将C1后轨迹去重结果与领域/回复证据分开保存，便携选样只读包内参考和注释。完整池150,234状态、正参考单元150,129状态及105个零参考单元属于不同口径。默认配方、下载、环境和发布使用[迁移说明](../migration/README.md)；完整池已在本机验收并完成私有发布及固定版本核验，目标机安装与真实GPU验收仍待完成。
 
 ## 环境与运行约定
 
-源机构造/原始数据分析使用`llm-efficiency`，训练/评测/Jev服务使用`mapika`，解释器根为`/data/wangsq/software/miniconda3/envs/`。进程级PYTHONPATH指定本项目src、只读`third_party/decider@d6fc522`及声明依赖，核对真实导入来源。底座位于`/data/wangsq/model/`，模型和GPU由本次协议明确指定，不沿用历史空闲卡或0.8B默认值。
+本机构造、原始数据分析、训练、离线评测和Jev服务统一使用`mapika`（train-runner角色），解释器根为`/data/wangsq/software/miniconda3/envs/`；新机个人路径和重建命令见[迁移说明](../migration/README.md)。进程级PYTHONPATH指定本项目src、只读`third_party/decider@d6fc522`及声明依赖，核对真实导入来源。底座位于`/data/wangsq/model/`，模型和GPU由本次协议明确指定，不沿用历史空闲卡或0.8B默认值。
 
-正式训练使用SwanLab `DX3906/action_distill`，run name由本次实验指定；smoke使用独立tmp输出及disabled记录。目标机train/runner合并环境、CUDA扩展和A100仍待验收。正式运行由用户启动；协议、输入、环境和输出明确后再执行，不把文档命令当作启动授权。
+正式训练使用SwanLab `DX3906/action_distill`，run name由本次实验指定；smoke使用独立tmp输出及disabled记录。本机train/runner合并及CPU验收已完成；目标机干净安装、CUDA扩展构建及A100真实执行仍待验收。正式运行由用户启动；协议、输入、环境和输出明确后再执行，不把文档命令当作启动授权。
 
 ## 固定语义与构造协议
 

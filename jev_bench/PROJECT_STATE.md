@@ -1,6 +1,6 @@
 # Jev benchmark 项目状态
 
-更新时间：2026-11-04 16:17 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 ## 当前阶段
 
@@ -8,9 +8,11 @@
 
 四项阶段性正式配置已准备：`configs/bfcl_mt_baselines_formal.json`、`configs/tau2_baselines_formal.json`、`configs/toolhop_baselines_formal.json`、`configs/apibank_baselines_formal.json`。条件依原序为Native、官方Jev、ActionOPD、DeepSeek建议器、STAR，comparisons空；每条件800/278/995题及1307决策点，五条件计划4000/1390/4975 episodes及6535点。PA仍属完整主表，待从零完整mapping；这些只是全量预览，未执行正式生成/评测，本轮不查端口或分配GPU。
 
-迁移本地入口齐备：环境候选约束/安装、服务命令、目标机配置、tokenizer-only CPU renderer、Ours门控/top3、PA显式解释器和公开GitHub/私有ModelScope发布流程。唯一操作顺序见[迁移说明](../migration/README.md)。目标机尚未安装验证，新机OS/A100显存/驱动/CUDA12.8 SDK、CUDA扩展及目标机真实smoke仍待核对；候选约束不是已求解环境锁。完整训练池已在本机导出并验收，ModelScope尚未上传；本地主线清理、干净初始提交和CPU验收已完成；GitHub主线初始提交`43c2b44`已发布到远端`main`，旧开发历史未发布。本轮fork迁移改动已在本地验证，待同步至GitHub。
+迁移本地入口齐备：环境候选约束/安装、服务命令、目标机配置、tokenizer-only CPU renderer、Ours门控/top3、PA显式解释器和公开GitHub/私有ModelScope发布流程。唯一操作顺序见[迁移说明](../migration/README.md)。目标机尚未安装验证，新机OS/A100显存/驱动/CUDA12.8 SDK、CUDA扩展及目标机真实smoke仍待核对；候选约束不是已求解环境锁。完整训练池已完成私有发布及12文件核验，固定版本见[Jev状态](../jev_train/PROJECT_STATE.md)；本地主线清理、干净初始提交和CPU验收已完成；GitHub远端`main`已包含fork迁移提交`ac75cd7`，旧开发历史未发布。本次发布脚本的版本读取修复已通过14项迁移CPU回归及远端只读验证，尚待提交并同步GitHub。
 
 τ²修复已发布至 `https://github.com/DX0369/tau2-bench-verified` 的 `actiondistill-retail-item-fix` 分支，远端指向固定提交 `3d82db8f3579efe29609ab9daff058a9b7cb187c`。迁移配置保持同一提交，从fork直接恢复；ModelScope只交付训练数据包，不再承担源码交付。原有HEAD/runtime dirty检查保持不变。训练池、v2已交付38k但未训练的状态统一见[Jev状态](../jev_train/PROJECT_STATE.md)，不在本页维护第二份训练计划。
+
+2026-11-04 18:11 CST +0800，本机主线已收束为五套环境：mapika（训练/现代runner/PA准备）、llm-efficiency（vLLM）、jev-apibank（独立评分）、jev-toolsandbox、jev-stabletoolbench。五套`pip check`及角色导入检查通过，保留各环境解析版本；已确认无运行消费者并删除trust、jev-toolhop，当前操作入口已同步。共享170、τ²14、ToolHop24、PA58、API-Bank14、ToolSandbox35、Stable26项，共341项测评CPU回归通过；连同训练204和数据审查30，共575项。BFCL补上游漏报的soundfile0.13.1，迁移测试修正mock对象；vLLM移除非主线trl/alfworld/textworld并对齐OTel1.45.1，ToolSandbox改用wheel0.45.1解决packaging冲突，Torch/vLLM核心版本不变。本轮未启动GPU、外部模型API或正式测评；目标机干净安装、CUDA构建和A100真实smoke仍待完成。
 
 2026-11-04 14:30 CST +0800，两处差分oracle改为自包含请求合同，保留七类建议/门控场景、重复调用不累积建议、历史不变，以及Qwen/STAR的采样和可选工具字段验证。共享CPU回归168项通过；初次两项失败分别为本机Git不支持新init参数和沙箱loopback权限，修正测试命令、在允许本机端口的环境定向复验后通过。第三方固定版本检查通过；未调用外部模型、运行正式评测或改写旧结果。
 
@@ -24,7 +26,7 @@
 | --- | --- |
 | 服务与路径 | STAR已于2026-11-04 10:21 CST +0800同盘移至共享`/data/wangsq/model/STAR-4b`，48文件inode/大小/mtime不变，10配置仅改model_path。PA显式--catalog-python/--qwen-model-path，API-Bank显式JEV_APIBANK_SCORING_PYTHON，无Conda名/本机默认路径 |
 | CPU renderer与策略 | 三条真实BFCL请求tokenizer-only回放与旧渲染完全一致，未加载权重；TypeSafe目标机无需旧A-38k权重。Ours默认top1，显式门控后可adaptive top3；Stable真实Finish/虚拟RESPOND各自概率/逻辑身份保留，不预选最终策略 |
-| 迁移边界 | Stable自检实际导入七必需模块、缺失失败；本地τ²包检查及22项迁移/正式配置、27项配置/CLI回归通过。发布代码已处理SDK空下载成功、上传返回旧HEAD，远端发布仍待认证和revision核验；没有远端下载/上传或环境安装 |
+| 迁移边界 | Stable自检实际导入七必需模块、缺失失败；本地τ²包检查及22项迁移/正式配置、27项配置/CLI回归通过。发布后从数据集信息读取固定版本并核对全部文件，14项迁移CPU回归及已发布私有版本的12文件核验通过；未安装目标机环境或运行GPU验收 |
 | 六项工程与统计 | 全量公开输入预检、预览/官方循环/评分/恢复/成本及正式配置/整簇统计/Holm/缺分边界CPU验证通过；不证明GPU、全量外部服务或方法效果 |
 | 共享失败语义 | 缺失/非法Jev元数据显式失败，只有动作损坏可advisor_format_error_neutral；精确renderer超长扩展、vLLM input_text/input_tokens识别与六项统一采样均有回归。Stable保持请求前2秒/限流后10秒；ToolSandbox计执行器提出调用，预算边界可能未实际执行 |
 | 最近去重整理 | 19项建议器元数据/动作和24项ToolSandbox路由CPU测试通过；保留null/空tool_calls、空串/空白正文和官方调用计数。下载/部署归迁移页，文档收束未改输入/评分/失败合同、未请求模型/API或正式测评 |

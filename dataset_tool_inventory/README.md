@@ -1,6 +1,6 @@
 # 数据集工具审查
 
-更新时间：2026-11-04 14:24 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 研究边界、环境和逐源许可见 [PROJECT](PROJECT.md)；当前正式扫描、分源 G3 及未完成项见 [PROJECT_STATE](PROJECT_STATE.md)。本页记录当前入口和审查方法，旧工具盘点不代替当前审查。
 
@@ -9,7 +9,7 @@
 以下正式命令由用户启动，输出必须是新目录；`--workers` 必填。默认数据根为工作区 `data/`，格式和白名单分别读取下列配置、策略文件，不按数据卡宣传补造字段。策略中的τ²污染核对路径相对于工作区根解析；显式绝对路径仍按原值读取。
 
 ```bash
-conda activate llm-efficiency
+conda activate mapika
 cd /data/wangsq/code/ActionDistill
 mkdir -p experiments/dataset_tool_inventory/outputs experiments/dataset_tool_inventory/tmp
 JEV_REVIEW_NAME="jev_review_$(date +%Y%m%d_%H%M%S)"
@@ -83,7 +83,7 @@ G3 只覆盖抽中状态，不证明未抽样、排除或隔离记录正确，�
 ## 测试与历史入口
 
 ```bash
-conda activate llm-efficiency
+conda activate mapika
 cd /data/wangsq/code/ActionDistill/experiments/dataset_tool_inventory
 python -m unittest discover -s tests
 ```

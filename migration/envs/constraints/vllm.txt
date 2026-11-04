@@ -9,3 +9,5 @@ numpy==2.2.6
 openai==2.53.0
 httpx==0.28.1
 huggingface-hub==1.27.0
+opentelemetry-sdk==1.45.1
+opentelemetry-exporter-otlp==1.45.1

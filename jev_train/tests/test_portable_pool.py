@@ -188,10 +188,10 @@ class PortablePoolTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     migration.validate_assets(invalid)
             target = root/'target with spaces'
-            lines = migration.plan(assets, target, root/'models', root/'package', 'sources')
+            lines = migration.plan(assets, target, root/'models', 'sources')
             self.assertFalse(target.exists())
             text = '\n'.join(lines)
-            self.assertIn('tau2-bench-verified.bundle', text)
+            self.assertIn('https://github.com/DX0369/tau2-bench-verified.git', text)
             self.assertIn('checkout --detach 3d82db8', text)
             self.assertIn("'"+str(target/'third_party')+"'", text)
 

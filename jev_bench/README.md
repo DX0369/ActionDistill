@@ -1,19 +1,19 @@
 # Jev benchmark
 
-更新时间：2026-11-04 12:19 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 本项目统一接入BFCL、τ²、ToolHop、API-Bank、ToolSandbox与StableToolBench。目标/固定资产见[PROJECT](PROJECT.md)，CPU和真实联调覆盖、原失败及待办见[PROJECT_STATE](PROJECT_STATE.md)。下载、环境重建、服务命令、目标机部署及启动顺序统一见[迁移说明](../migration/README.md)；本文维护运行、方法、统计和恢复合同。当前正式主表未启动，最终Ours和全量PA映射尚待确定。
 
 ## 先做离线预览与测试
 
-默认`run.py --config <配置>`只预览，不调用模型/服务、不需GPU。下表保留六项独立运行/评分环境；新机候选环境合并须先验收，不能自行把本机独立评分环境替换掉。
+默认`run.py --config <配置>`只预览，不调用模型/服务、不需GPU。BFCL、τ²、ToolHop及API-Bank生成共用`mapika`；API-Bank评分、ToolSandbox和Stable使用独立环境。下表为本机当前入口，新机按迁移说明重建和验收。
 
 | benchmark | 本机解释器环境 | 预览配置（configs/） | CPU回归目录 |
 | --- | --- | --- | --- |
-| BFCL | trust | bfcl_mt_native_smoke.json（4类各2题，共8条） | tests |
-| τ² | llm-efficiency | tau2_native_smoke.json（三域各1，共3条） | tests_tau2 |
-| ToolHop | jev-toolhop | toolhop_cpu_preview.json（0/44两题） | tests_toolhop |
-| API-Bank | jev-apibank预览/评分；trust生成 | apibank_cpu_preview.json（六类各1点） | tests_apibank |
+| BFCL | mapika | bfcl_mt_native_smoke.json（4类各2题，共8条） | tests |
+| τ² | mapika | tau2_native_smoke.json（三域各1，共3条） | tests_tau2 |
+| ToolHop | mapika | toolhop_cpu_preview.json（0/44两题） | tests_toolhop |
+| API-Bank | jev-apibank预览/评分；mapika生成 | apibank_cpu_preview.json（六类各1点） | tests_apibank |
 | ToolSandbox | jev-toolsandbox | toolsandbox_cpu_preview.json（两个本地场景） | tests_toolsandbox |
 | StableToolBench | jev-stabletoolbench | stabletoolbench_cpu_preview.json（六组各1题） | tests_stabletoolbench |
 
@@ -21,7 +21,7 @@
 
 ```bash
 cd /data/wangsq/code/ActionDistill/experiments/jev_bench
-JEV_BENCH_PYTHON=/data/wangsq/software/miniconda3/envs/trust/bin/python
+JEV_BENCH_PYTHON=/data/wangsq/software/miniconda3/envs/mapika/bin/python
 CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 LITELLM_LOCAL_MODEL_COST_MAP=True \
   "$JEV_BENCH_PYTHON" -B scripts/run.py --config configs/bfcl_mt_native_smoke.json
 
@@ -30,7 +30,7 @@ PYTHONPATH=src:. CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 \
   "$JEV_BENCH_PYTHON" -B -m unittest discover -s tests -t . -v
 ```
 
-τ²预览/测试设置`LITELLM_LOCAL_MODEL_COST_MAP=True`；API-Bank离线预览设置`HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1`并使用已到位MiniLM。共享HTTP fixture用loopback假服务及SDK mock，需允许本机临时端口，不做外部推理。PA命名回归在llm-efficiency下用`PYTHONPATH=src:. python -B -m unittest discover -s tests_pa_tool -t . -v`。这些脚本actor、CPU预览和import检查不能当模型准确率或真实smoke；测试临时文件只在本项目tmp创建和清理。
+τ²预览/测试设置`LITELLM_LOCAL_MODEL_COST_MAP=True`；API-Bank离线预览设置`HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1`并使用已到位MiniLM。共享HTTP fixture用loopback假服务及SDK mock，需允许本机临时端口，不做外部推理。PA命名回归在mapika下用`PYTHONPATH=src:. python -B -m unittest discover -s tests_pa_tool -t . -v`。这些脚本actor、CPU预览和import检查不能当模型准确率或真实smoke；测试临时文件只在本项目tmp创建和清理。
 
 ## 扩展正式配置与统计
 
@@ -40,10 +40,10 @@ PYTHONPATH=src:. CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 \
 
 | configs/中的阶段性配置 | 环境 | 每条件输入 | 五条件计划 |
 | --- | --- | ---: | ---: |
-| bfcl_mt_baselines_formal.json | trust | 800题 | 4000 episodes |
-| tau2_baselines_formal.json | llm-efficiency | 278题 | 1390 episodes |
-| toolhop_baselines_formal.json | jev-toolhop | 995题 | 4975 episodes |
-| apibank_baselines_formal.json | trust生成／jev-apibank评分 | 1307点 | 6535决策点 |
+| bfcl_mt_baselines_formal.json | mapika | 800题 | 4000 episodes |
+| tau2_baselines_formal.json | mapika | 278题 | 1390 episodes |
+| toolhop_baselines_formal.json | mapika | 995题 | 4975 episodes |
+| apibank_baselines_formal.json | mapika生成／jev-apibank评分 | 1307点 | 6535决策点 |
 
 配置仍保留本机Qwen8001、ActionOPD8005、STAR8006、本地renderer18767及旧TypeSafe的ours_jev绑定。新机由`migration/deploy.py`生成独立配置、TypeSafe改绑tokenizer-only jev_render；health验证渲染能力，不能当动作建议器。预览已通过，端口/目标机服务尚待验收，正式未运行。
 
@@ -56,7 +56,7 @@ PYTHONPATH=src:. CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 \
 ```bash
 cd /data/wangsq/code/ActionDistill
 JEV_FORMAL_BENCHMARK=toolhop
-/data/wangsq/software/miniconda3/envs/trust/bin/python -B \
+/data/wangsq/software/miniconda3/envs/mapika/bin/python -B \
   experiments/jev_bench/scripts/prepare_formal_config.py \
   --template "experiments/jev_bench/configs/${JEV_FORMAL_BENCHMARK}_main_smoke.json" \
   --conditions native official_jev ours actionopd star pa_tool \
@@ -154,7 +154,7 @@ CPU测试用loopback假HTTP服务及SDK mock，须允许绑定本机临时端口
 
 ## PA-Tool：先冻结接口，再运行独立条件
 
-原生Qwen3-4B thinking权重不变，只改工具与顶层输入参数名。实现依据[论文Algorithm1、Appendix A.3/L](https://aclanthology.org/2026.acl-long.948.pdf)，不是作者执行代码：pa_tool_prepare负责命名/选择，pa_tool_catalog复用官方转换，pa_tool映射结构化接口，pa_tool_text处理API-Bank确定文本跨度。生成用llm-efficiency/RapidFuzz，提取及评测用各benchmark原环境。
+原生Qwen3-4B thinking权重不变，只改工具与顶层输入参数名。实现依据[论文Algorithm1、Appendix A.3/L](https://aclanthology.org/2026.acl-long.948.pdf)，不是作者执行代码：pa_tool_prepare负责命名/选择，pa_tool_catalog复用官方转换，pa_tool映射结构化接口，pa_tool_text处理API-Bank确定文本跨度。命名准备使用mapika/RapidFuzz，Qwen执行器由llm-efficiency/vLLM提供；catalog提取及评测按各benchmark环境运行。
 
 ### 冻结的PA16方法
 
@@ -186,8 +186,8 @@ API-Bank/ToolSandbox/Stable的PA接口失败为终态、official_scored=false，
 
 ```bash
 cd /data/wangsq/code/ActionDistill
-JEV_PREPARE_PYTHON=/data/wangsq/software/miniconda3/envs/llm-efficiency/bin/python
-JEV_CATALOG_PYTHON=/data/wangsq/software/miniconda3/envs/trust/bin/python
+JEV_PREPARE_PYTHON=/data/wangsq/software/miniconda3/envs/mapika/bin/python
+JEV_CATALOG_PYTHON=/data/wangsq/software/miniconda3/envs/mapika/bin/python
 JEV_QWEN_MODEL_PATH=/data/wangsq/model/Qwen3-4B
 JEV_PA_BENCHMARK=bfcl_mt
 JEV_PA_CONFIG="experiments/jev_bench/configs/${JEV_PA_BENCHMARK}_baselines_formal.json"
@@ -278,7 +278,7 @@ CPU回归覆盖三域官方成功/失败、telecom付款与状态同步及Jev不
 
 `tool_call_count`统计执行器生成的工具调用数，不包含用户的`end_conversation`。消息预算耗尽时，末批调用可能尚未交给环境执行，因此该字段不能解释为实际执行或成功完成的工具次数；当前字段及统计规则保持不变。
 
-ToolSandbox独立环境及httpx0.27.2兼容约束按[迁移说明](../migration/README.md)重建，不向trust/mapika补装。CPU预览为2本地场景×native、user_simulator=null、mode=cpu_only；服务检查/执行在导入环境和创建批次前拒绝。main_smoke保留原本地子集，formal必须全量1032。
+ToolSandbox独立环境及httpx0.27.2兼容约束按[迁移说明](../migration/README.md)重建，不向mapika或vLLM环境补装旧SDK栈。CPU预览为2本地场景×native、user_simulator=null、mode=cpu_only；服务检查/执行在导入环境和创建批次前拒绝。main_smoke保留原本地子集，formal必须全量1032。
 
 按官方named_scenarios和seed=42建完整catalog再选ID，保持工具顺序并恢复Python RNG。共129个原始场景×8变体=1032；由原始标签及7个固定后缀识别扰动家族，不按近似名称合并。官方类别重叠，不套BFCL互斥分组。构造场景不调用API。全量包含官方RapidAPI地图、天气、股票和汇率等工具，需要`RAPID_API_KEY`及对应订阅；地址、地图、当天/第4天天气和股票已有有界真实接口与官方解析验证。汇率按用户确认的服务迁移固定采用下述新接口；完整场景可用性尚未验收，有界接口检查不等于全量benchmark完成，状态与证据见PROJECT_STATE。
 
@@ -326,7 +326,7 @@ L1/L2错误标签沿官方error_statistic，MISS_INPUT_ARGUMENT对应缺required
 
 两个官方ToolSearcher的模型构造入口仅在CPU测试上下文中绑定到已有绝对路径、`device=cpu`及HF离线模式，保留官方检索算法；退出时恢复构造器、工作目录和环境变量。源码和模型文件不修改，绝不借远端模型ID自动下载。该上下文涉及进程全局状态，不在线程间并发使用。
 
-cpu_preview为六类各1点且拒绝真实调用；main_smoke为六类×六条件，trust生成、jev-apibank worker评分。生成后pending_scoring，完整condition/trial才按发布顺序组评分，组score为唯一来源。恢复复用prediction/attempt；不完整组可继续缺失生成，不重抽已完成点。API与回复分开描述；评分可调用Translate等官方工具，不保证离线。
+cpu_preview为六类各1点且拒绝真实调用；main_smoke为六类×六条件，mapika生成、jev-apibank worker评分。生成后pending_scoring，完整condition/trial才按发布顺序组评分，组score为唯一来源。恢复复用prediction/attempt；不完整组可继续缺失生成，不重抽已完成点。API与回复分开描述；评分可调用Translate等官方工具，不保证离线。
 
 API-Bank服务预检和评分worker共用必填环境变量`JEV_APIBANK_SCORING_PYTHON`，没有默认解释器或自动环境切换。运行前指定目标机器上已按迁移说明重建的评分环境：
 
@@ -336,7 +336,7 @@ API-Bank服务预检和评分worker共用必填环境变量`JEV_APIBANK_SCORING_
 export JEV_APIBANK_SCORING_PYTHON=/data/wangsq/software/miniconda3/envs/jev-apibank/bin/python
 ```
 
-独立评分环境保留Torch2.2.2、SentenceTransformers2.2.2与旧googletrans/httpx，不装新版OpenAI SDK；完整安装只维护于[迁移说明](../migration/README.md)。不要用trust替代或修改旧config/分数迁移。
+独立评分环境保留Torch2.2.2、SentenceTransformers2.2.2与旧googletrans/httpx，不装新版OpenAI SDK；完整安装只维护于[迁移说明](../migration/README.md)。不要用现代runner替代独立评分环境或修改旧config/分数迁移。
 
 ## ToolHop：官方循环、评分与工程smoke入口
 

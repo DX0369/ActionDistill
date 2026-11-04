@@ -2,6 +2,7 @@
 import importlib.util
 import io
 import json
+import os
 import shlex
 import subprocess
 import sys
@@ -238,7 +239,7 @@ class MigrationTests(unittest.TestCase):
                  patch.object(checker.platform, 'python_version', return_value=environment.PYTHON['train']), \
                  patch.object(checker, 'editable_sources', return_value=[]), \
                  patch.object(checker.importlib, 'import_module', side_effect=import_module), \
-                 patch.dict('os.environ', {'CUDA_VISIBLE_DEVICES': ''}), redirect_stdout(output):
+                 patch.dict(os.environ, {'CUDA_VISIBLE_DEVICES': ''}), redirect_stdout(output):
                 if error is not None:
                     with self.assertRaises(error):
                         checker.main()
@@ -252,11 +253,9 @@ class MigrationTests(unittest.TestCase):
         publication = migration_module('publish')
         revision = 'a'*40
         api = SimpleNamespace(dataset_info=Mock(return_value=SimpleNamespace(visibility=1, sha=revision)))
-        self.assertEqual(publication.upload_revision(api, 'owner/dataset',
-                         [SimpleNamespace(oid='b'*40), SimpleNamespace(oid=revision)]), revision)
-        for result in ([], SimpleNamespace(oid=''), SimpleNamespace(oid='not-a-commit')):
-            with self.subTest(result=result), self.assertRaises(ValueError):
-                publication.upload_revision(api, 'owner/dataset', result)
+        for invalid in ('', 'not-a-commit', None):
+            with self.subTest(revision=invalid), self.assertRaises(ValueError):
+                publication.checked_revision(api, 'owner/dataset', invalid)
         for info in (SimpleNamespace(visibility=0, sha=revision), SimpleNamespace(visibility=1, sha='b'*40)):
             api.dataset_info.return_value = info
             with self.assertRaises(ValueError):
@@ -287,6 +286,21 @@ class MigrationTests(unittest.TestCase):
                                             golden_replays=[8000,38000,76000]))
             (root/'manifest.json').write_text(json.dumps(manifest))
             publication.completed_pool(root)
+            (root/'metadata/command.txt').write_text('fixture command\n')
+            expected = {**files, **{name: file_identity(root/name) for name in
+                        ('manifest.json', 'metadata/command.txt', 'metadata/run_status.json')}}
+            api.upload_folder = Mock(return_value=SimpleNamespace(oid=''))
+            api.get_dataset_files = Mock(return_value=[dict(
+                Path=name, Type='blob', Size=item['size_bytes'], Sha256=item['sha256'])
+                for name, item in expected.items()])
+            output = io.StringIO()
+            with patch.object(publication, 'private_hub', return_value=(api, 'not-logged')), \
+                 redirect_stdout(output):
+                publication.publish_data(root, 'owner/dataset')
+            self.assertIn('revision: '+revision, output.getvalue())
+            self.assertEqual(set(api.upload_folder.call_args.kwargs['allow_patterns']), set(expected))
+            api.get_dataset_files.assert_called_once_with(
+                'owner/dataset', revision=revision, recursive=True, page_size=100)
             manifest['smoke'] = True
             (root/'manifest.json').write_text(json.dumps(manifest))
             with self.assertRaisesRegex(ValueError, 'completed full frozen pool'):
@@ -296,6 +310,27 @@ class MigrationTests(unittest.TestCase):
             (root/'pool/train.jsonl').write_text('changed\n')
             with self.assertRaises(ValueError):
                 publication.completed_pool(root)
+
+    def test_uploaded_revision_rejects_stale_missing_or_different_remote_files(self):
+        publication = migration_module('publish')
+        revision = 'a'*40
+        expected = {'pool/train.jsonl': dict(size_bytes=12, sha256='b'*64)}
+        row = dict(Path='pool/train.jsonl', Type='blob', Size=12, Sha256='b'*64)
+        api = SimpleNamespace(
+            dataset_info=Mock(return_value=SimpleNamespace(visibility=1, sha=revision)),
+            get_dataset_files=Mock(return_value=[row]))
+        self.assertEqual(publication.upload_revision(api, 'owner/dataset', expected), revision)
+        for rows in ([], [dict(row, Size=13)], [dict(row, Sha256='c'*64)]):
+            api.get_dataset_files.return_value = rows
+            with self.subTest(rows=rows), self.assertRaisesRegex(ValueError, 'file missing or differs'):
+                publication.upload_revision(api, 'owner/dataset', expected)
+        for field in ('Size', 'Sha256'):
+            api.get_dataset_files.return_value = [{key: value for key, value in row.items() if key != field}]
+            with self.subTest(missing=field), self.assertRaises(KeyError):
+                publication.upload_revision(api, 'owner/dataset', expected)
+        api.dataset_info.return_value = SimpleNamespace(visibility=1, sha='')
+        with self.assertRaisesRegex(ValueError, 'immutable 40-character revision'):
+            publication.upload_revision(api, 'owner/dataset', expected)
 
 
     def test_stable_environment_check_rejects_missing_runtime_modules(self):
@@ -315,7 +350,7 @@ class MigrationTests(unittest.TestCase):
                  patch.object(checker.argparse.ArgumentParser, 'parse_args', return_value=args), \
                  patch.object(checker.platform, 'python_version', return_value=environment.PYTHON['stabletoolbench']), \
                  patch.object(checker.importlib, 'import_module', side_effect=import_module), \
-                 patch.dict('os.environ', {'CUDA_VISIBLE_DEVICES': ''}), redirect_stdout(output):
+                 patch.dict(os.environ, {'CUDA_VISIBLE_DEVICES': ''}), redirect_stdout(output):
                 if missing is not None:
                     with self.assertRaises(ModuleNotFoundError):
                         checker.main()

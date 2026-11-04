@@ -1,6 +1,6 @@
 # ActionDistill 迁移与运行
 
-更新时间：2026-11-04 16:12 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 本页是唯一迁移说明，覆盖旧机交付和新机运行。工作区布局为 `ActionDistill/experiments/` 代码仓库，旁边按 [assets.json](assets.json) 恢复固定版本的 `third_party/`，第三方源码独立管理，不复制进ActionDistill主仓库；下载模型、数据和实验输出独立管理。代码发布到公开 `DX0369/ActionDistill`，整理数据发布到私有 `dx0369/ActionDistill`。
 
@@ -65,12 +65,12 @@ recipes/task_reply_v2_38k.json
 metadata/{command.txt,run_status.json}
 ```
 
-完整冻结池已导出至 `jev_train/outputs/selection_pool_20261104_124748/`，150,234条，正文读回、现有38k逐条一致、8k/38k/76k黄金重放和文件校验均通过，可直接进入发布。原manifest保留构造提交身份，公开初始提交不替代它。
+完整冻结池已导出至 `jev_train/outputs/selection_pool_20261104_124748/`，150,234条，正文读回、现有38k逐条一致、8k/38k/76k黄金重放和文件校验均通过。已发布至私有 `dx0369/ActionDistill`，固定revision为 `0ef5045ecc3ab4f6a6d85d97834e6b2a64d17960`；远端12个文件大小及SHA256均已核对。原manifest保留构造提交身份，公开初始提交不替代它。
 
 以下命令仅用于以后获准重新构造冻结包；本次交付无需重跑。它是正式资产生成，由用户启动，输出必须是新目录：
 
 ```bash
-conda activate llm-efficiency
+conda activate mapika
 cd /data/wangsq/code/ActionDistill
 JEV_POOL_OUT="experiments/jev_train/outputs/selection_pool_$(date +%Y%m%d_%H%M%S)"
 setsid --wait python -B -u experiments/jev_train/scripts/export_selection_pool.py \
@@ -118,20 +118,30 @@ cd /data/wangsq/code/ActionDistill
 )
 ```
 
-池发布仅接受 completed、非 smoke 的150,234条包，并要求38k逐条一致、三档黄金重放及文件内容验证通过。上传前自动执行文件内容校验，只上传manifest列出的数据文件和两份metadata，不上传原始149GB轨迹、缓存或旧输出。记录最终40位revision；新机下载仅包含这份数据包，不依赖源码附件。
+池发布仅接受 completed、非 smoke 的150,234条包，并要求38k逐条一致、三档黄金重放及文件内容验证通过。上传前自动执行文件内容校验，只上传manifest列出的数据文件和两份metadata，不上传原始149GB轨迹、缓存或旧输出。上传后从数据集信息读取40位revision，确认该固定版本为私有，并逐项核对12个文件的大小及SHA256；不依赖SDK可能为空的上传oid。新机下载仅包含这份数据包，不依赖源码附件。
 
 ## 新机公共准备
 
 ### 路径、源码与下载
 
-公共准备采用覆盖训练与六项测评的完整环境。先填写已有 Python ≥3.10、Conda 和 CUDA 12.8 SDK 的绝对路径；源码恢复不需要ModelScope token或数据包revision。代码目录固定放在工作区的 `experiments/`；模型根目录可自行指定。
+公共准备采用覆盖训练与六项测评的完整环境。共享账号下使用个人根目录 `/file_storage01/home/zuchaoli/wangsq`，模型、环境、工作区和缓存均使用显式路径。先填写已有 Python ≥3.10、Conda 和 CUDA 12.8 SDK 的绝对路径；源码恢复不需要ModelScope token或数据包revision。代码目录固定放在工作区的 `experiments/`；模型根目录可自行指定。
 
 ```bash
-export JEV_WORKSPACE_ROOT="$HOME/code/ActionDistill"
-export JEV_MODEL_ROOT="$HOME/model"
-export JEV_ENVS_ROOT="$HOME/.conda/envs"
+export JEV_PERSONAL_ROOT=/file_storage01/home/zuchaoli/wangsq
+export JEV_WORKSPACE_ROOT="$JEV_PERSONAL_ROOT/code/ActionDistill"
+export JEV_MODEL_ROOT="$JEV_PERSONAL_ROOT/model"
+export JEV_ENVS_ROOT="$JEV_PERSONAL_ROOT/envs"
 export JEV_POOL_ROOT="$JEV_WORKSPACE_ROOT/data/selection_pool_v2"
 export JEV_TRAIN_PREFIX="$JEV_ENVS_ROOT/actiondistill-train"
+export JEV_CACHE_ROOT="$JEV_PERSONAL_ROOT/cache"
+export PIP_CACHE_DIR="$JEV_CACHE_ROOT/pip"
+export CONDA_PKGS_DIRS="$JEV_CACHE_ROOT/conda/pkgs"
+export HF_HUB_CACHE="$JEV_CACHE_ROOT/huggingface/hub"
+export HF_XET_CACHE="$JEV_CACHE_ROOT/huggingface/xet"
+export MODELSCOPE_CACHE="$JEV_CACHE_ROOT/modelscope"
+export NLTK_DATA="$JEV_CACHE_ROOT/nltk_data"
+export TORCH_EXTENSIONS_DIR="$JEV_CACHE_ROOT/torch_extensions"
+export TRITON_CACHE_DIR="$JEV_CACHE_ROOT/triton"
 : "${JEV_BOOTSTRAP_PYTHON:?填写已有Python的绝对路径}"
 : "${JEV_CONDA_EXE:?填写conda可执行文件的绝对路径}"
 : "${JEV_CUDA_HOME:?填写CUDA12.8 SDK的绝对路径}"
@@ -148,17 +158,27 @@ export PATH="$JEV_BOOTSTRAP/bin:$PATH"
   --workspace-root "$JEV_WORKSPACE_ROOT" --model-root "$JEV_MODEL_ROOT" --stage all
 ```
 
+路径变量只设置安装和下载位置，不改变共享账号的HOME或凭据配置。模型下载可单独预览：
+
+```bash
+"$JEV_BOOTSTRAP/bin/python" -B experiments/migration/prepare.py \
+  --workspace-root "$JEV_WORKSPACE_ROOT" \
+  --model-root /file_storage01/home/zuchaoli/wangsq/model --stage models
+```
+
 ## 环境重建
 
-`envs/requirements/` 只列运行依赖，`envs/constraints/` 固定关键版本；它们是候选安装约束，并非已求解的 lock。目标为五个长期环境，其中 `train-runner` 合并训练/本地 Jev 服务/CPU renderer/现代 runner。若实际 resolver 或 smoke 证明无法合并，分别安装 train、runner，成为六个；不静默改包版本。
+`envs/requirements/` 列运行依赖，`envs/constraints/` 固定关键版本，不复制全量 `pip freeze`。本机已按以下五个环境完成合并、依赖检查和575项CPU回归；新机仍按下列命令重建并验收CUDA/A100。约束不是完整lock，实际解析版本保存在各环境的 `resolved-packages.txt`。
 
-| 角色 | Python | 职责 |
-|---|---|---|
-| train-runner | 3.11.16 | 训练、离线评测/校准、Jev/renderer；BFCL、τ²、ToolHop、API-Bank生成和PA命名 |
-| vllm | 3.11.15 | Qwen、ActionOPD、STAR执行器 |
-| apibank | 3.10.22 | MiniLM检索、旧googletrans/httpx及官方评分 |
-| toolsandbox | 3.11.18 | 固定旧SDK栈、官方场景与评分 |
-| stabletoolbench | 3.10.22 | Pydantic 1轻运行栈、官方循环/评分 |
+| 角色 | 本机环境 | Python | 职责 |
+|---|---|---|---|
+| train-runner | mapika | 3.11.16 | 数据审查/构造、CPU分析、训练、离线评测/校准、Jev/renderer；BFCL、τ²、ToolHop、API-Bank生成和PA准备 |
+| vllm | llm-efficiency | 3.11.15 | Qwen、ActionOPD、STAR执行器 |
+| apibank | jev-apibank | 3.10.22 | MiniLM检索、旧googletrans/httpx及官方评分 |
+| toolsandbox | jev-toolsandbox | 3.11.18 | 固定旧SDK栈、官方场景与评分 |
+| stabletoolbench | jev-stabletoolbench | 3.10.22 | Pydantic 1轻运行栈、官方循环/评分 |
+
+本机已删除由mapika承接的 `trust`、`jev-toolhop`，其他非主线环境未改。训练核心保持Torch2.10.0、Transformers5.17.0、causal-conv1d1.7.0和FLA0.5.2；运行清单补齐BFCL实际导入的soundfile0.13.1，vLLM约束对齐OTel1.45.1。上游安装声明会带入部分开发工具/厂商SDK，不绕过其依赖声明强行卸包。
 
 训练/vLLM固定Torch2.10 cu128；训练的causal-conv1d扩展需要匹配CUDA12.8 SDK或明确指定兼容wheel。目标机先核对系统、A100显存、驱动、`nvcc --version`，不复制旧环境二进制，也不默认把双卡训练改成八卡。
 
@@ -182,10 +202,10 @@ export JEV_TRAIN_PYTHON="$JEV_TRAIN_PREFIX/bin/python"
 export JEV_RUNNER_PYTHON="$JEV_TRAIN_PYTHON"
 export JEV_VLLM_PYTHON="$JEV_ENVS_ROOT/actiondistill-vllm/bin/python"
 export JEV_APIBANK_SCORING_PYTHON="$JEV_ENVS_ROOT/actiondistill-apibank/bin/python"
-"$JEV_APIBANK_SCORING_PYTHON" -m nltk.downloader punkt
+"$JEV_APIBANK_SCORING_PYTHON" -m nltk.downloader -d "$NLTK_DATA" punkt
 ```
 
-若环境按 train/runner 拆开，把 `JEV_TRAIN_PYTHON` 和 `JEV_RUNNER_PYTHON` 分别设为相应解释器。以后新开终端时重新设置上述路径变量即可。
+训练与现代runner共用 `JEV_TRAIN_PREFIX`；以后新开终端时重新设置上述路径变量即可。
 
 ## 服务、部署配置和建议策略
 
@@ -284,6 +304,7 @@ setsid --wait env LITELLM_LOCAL_MODEL_COST_MAP=True \
 
 ```bash
 cd "$JEV_WORKSPACE_ROOT"
+JEV_DATA_REVISION=0ef5045ecc3ab4f6a6d85d97834e6b2a64d17960
 read -r -s -p 'ModelScope token: ' MODELSCOPE_API_TOKEN
 printf '\n'
 export MODELSCOPE_API_TOKEN
@@ -431,4 +452,4 @@ benchmark 的原配置、原 run-id 和源码身份保持一致时，符合恢�
 3. 六项全量输入预览、最终模型/温度/门控/映射身份核对；代表性episode按官方评分和成本记录验收。
 4. 核对TypeSafe/DeepSeek、Stable的 `TOOLBENCH_KEY`、ToolSandbox订阅/额度及API-Bank联网点；提交最终配置，用户启动正式运行。
 
-执行/恢复/汇总继续使用 `jev_bench/scripts/run.py`、`summarize.py` 和各benchmark原生输入，不新增调度框架或重算历史结果。尚未确认的目标机OS/显存/驱动、完整池发布及许可、最终Ours与PA映射均保留为部署前待办；有CPU测试证据不表示正式训练/测评已经完成。
+执行/恢复/汇总继续使用 `jev_bench/scripts/run.py`、`summarize.py` 和各benchmark原生输入，不新增调度框架或重算历史结果。尚未确认的目标机OS/显存/驱动、环境安装、最终Ours与PA映射均保留为部署前待办；有CPU测试证据不表示正式训练/测评已经完成。

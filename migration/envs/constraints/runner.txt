@@ -25,3 +25,5 @@ holidays==0.107
 pytz==2026.6
 roman==5.2
 sympy==1.14.0
+qwen-agent==0.0.34
+soundfile==0.13.1

@@ -1,6 +1,6 @@
 # Jev 标准 benchmark 评测
 
-更新时间：2026-11-04 16:12 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 ## 研究目标
 
@@ -16,16 +16,16 @@
 
 ## 资产与环境
 
-本机工作区 `/data/wangsq/code/ActionDistill`，Conda前缀 `/data/wangsq/software/miniconda3/envs/`。模型服务为`llm-efficiency`（vLLM0.19.1）和`mapika`（本地Jev），通用下载模型位于共享`/data/wangsq/model/`；自训Jev保留在各run。以下为固定资产与当前环境，目标机候选约束尚待干净安装验证，不能当已求解环境锁。
+本机工作区 `/data/wangsq/code/ActionDistill`，Conda前缀 `/data/wangsq/software/miniconda3/envs/`。模型服务为`llm-efficiency`（vLLM0.19.1）和`mapika`（本地Jev）；现代runner/PA准备由`mapika`承担，API-Bank评分、ToolSandbox和Stable保留独立环境。通用下载模型位于共享`/data/wangsq/model/`；自训Jev保留在各run。以下为固定资产与当前环境；本机五环境CPU验收已完成，目标机干净安装和GPU验收见[迁移说明](../migration/README.md)。
 
 | 资产 | 固定来源／环境 |
 | --- | --- |
-| BFCL | `third_party/gorilla/berkeley-function-call-leaderboard`，`6ea57973c7a6097fd7c5915698c54c17c5b1b6c8`；`trust` |
-| τ² Verified | `third_party/tau2-bench-verified`，[DX0369/tau2-bench-verified](https://github.com/DX0369/tau2-bench-verified)固定`3d82db8f3579efe29609ab9daff058a9b7cb187c`，含已发布retail属性修复；`llm-efficiency` |
+| BFCL | `third_party/gorilla/berkeley-function-call-leaderboard`，`6ea57973c7a6097fd7c5915698c54c17c5b1b6c8`；`mapika` |
+| τ² Verified | `third_party/tau2-bench-verified`，[DX0369/tau2-bench-verified](https://github.com/DX0369/tau2-bench-verified)固定`3d82db8f3579efe29609ab9daff058a9b7cb187c`，含已发布retail属性修复；`mapika` |
 | ToolSandbox | `third_party/ToolSandbox`，`c8571d7854316d2e1c5f288e59fe1e34e53f6dd1`；`jev-toolsandbox` |
-| API-Bank | `third_party/DAMO-ConvAI/api-bank`，父仓`faf754671f5b850e1b4d1ff870db37a6a2480df6`；`data/API-Bank/test-data/`；`trust`生成、`jev-apibank`评分 |
+| API-Bank | `third_party/DAMO-ConvAI/api-bank`，父仓`faf754671f5b850e1b4d1ff870db37a6a2480df6`；`data/API-Bank/test-data/`；`mapika`生成、`jev-apibank`评分 |
 | MiniLM检索器 | `/data/wangsq/model/paraphrase-MiniLM-L3-v2`；评分环境保留Torch2.2.2、SentenceTransformers2.2.2与旧googletrans/httpx |
-| ToolHop | `third_party/ToolHop`，HF快照`b439d7279af359fda46e8117ae4f0245b75f5c6b`，按下载metadata核对；`jev-toolhop` |
+| ToolHop | `third_party/ToolHop`，HF快照`b439d7279af359fda46e8117ae4f0245b75f5c6b`，按下载metadata核对；`mapika` |
 | StableToolBench | `third_party/StableToolBench`，`aa4ed9f4737ad98bd706663f01d63623c3427812`；`jev-stabletoolbench` |
 | Stable缓存 | `data/StableToolBench/server_cache.zip`，`stabletoolbench/Cache` revision`c6aca0c1cda74d54915eccabb60984dc083fb14c`；只读ZIP，不全量解压 |
 | ActionOPD | `/data/wangsq/model/Qwen3-4B-ActionOPD-DeepSeek-V4-Flash`，`nics-efc/Qwen3-4B-ActionOPD-DeepSeek-V4-Flash` revision`edc207707325a40e16b7f09940352fd62c34b91a` |

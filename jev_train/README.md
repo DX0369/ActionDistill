@@ -1,6 +1,6 @@
 # Jev 样本构造与 decider 训练
 
-更新时间：2026-11-04 14:24 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 当前v2选样、训练、评测与服务入口见本文；研究目标和资产约定见[PROJECT](PROJECT.md)，当前输入、完成状态、结论和下一步见[PROJECT_STATE](PROJECT_STATE.md)。新服务器下载冻结池、选样、环境、训练及校准统一使用[迁移说明](../migration/README.md)。完整冻结池已在本机导出并验收，发布和目标机验收仍待完成。
 
@@ -26,7 +26,7 @@ cd /data/wangsq/code/ActionDistill/experiments/jev_train
 v2_review=outputs/curation_preview_task_reply_v2_20261103_201241/summary.json
 CUDA_VISIBLE_DEVICES='' HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 setsid --wait \
-  /data/wangsq/software/miniconda3/envs/llm-efficiency/bin/python -B \
+  /data/wangsq/software/miniconda3/envs/mapika/bin/python -B \
   scripts/preview_task_reply_v2.py --config configs/selection/task_reply_v2_76k.json \
   --review "$v2_review" \
   --output "outputs/curation_preview_task_reply_v2_76k_$(TZ=Asia/Shanghai date +%Y%m%d_%H%M%S)"
@@ -48,7 +48,7 @@ CUDA_VISIBLE_DEVICES='' HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
 cd /data/wangsq/code/ActionDistill/experiments/jev_train
 CUDA_VISIBLE_DEVICES='' HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 setsid --wait \
-  /data/wangsq/software/miniconda3/envs/llm-efficiency/bin/python -B \
+  /data/wangsq/software/miniconda3/envs/mapika/bin/python -B \
   scripts/write_task_reply_samples.py \
   --preview outputs/curation_preview_task_reply_v2_76k_20261103_205916 \
   --output "outputs/samples_task_reply_v2_38k_$(TZ=Asia/Shanghai date +%Y%m%d_%H%M%S)"
@@ -135,7 +135,7 @@ def read_sample(path, offset, expected_id):
 
 ## 环境和测试
 
-构造用`llm-efficiency`；训练/服务/评测用`mapika`。根目录运行，复用只读审查适配器、eligibility和`third_party/decider@d6fc522`，不使用mapika中旧decider包；启动校验实际导入路径：
+数据构造、CPU分析、训练/服务/评测统一使用`mapika`（train-runner角色）。根目录运行，复用只读审查适配器、eligibility和固定`third_party/decider@d6fc522`；环境editable已指向该checkout，启动校验实际导入路径：
 
 ```bash
 export PYTHONPATH="$PWD/third_party/decider:$PWD/experiments/jev_train/src:$PWD/experiments/dataset_tool_inventory/src"
@@ -151,7 +151,7 @@ python -B -m unittest discover -s experiments/jev_train/tests
 正式样本已完成；以下供用户另行授权复现，每次新目录：
 
 ```bash
-conda activate llm-efficiency
+conda activate mapika
 cd /data/wangsq/code/ActionDistill
 JEV_SAMPLES_NAME="samples_$(date +%Y%m%d_%H%M%S)"
 JEV_SAMPLES_DIR="$PWD/experiments/jev_train/outputs/$JEV_SAMPLES_NAME"
@@ -240,7 +240,7 @@ CUDA_VISIBLE_DEVICES="$JEV_DDP_GPUS" setsid --wait torchrun \
 正式样本不含option_names，沿用tool_name()解析，不回填。脚本流式读行，只留ID集合、频数及有限编码缓存；默认新建sample_stats目录，输出summary与两个metadata，smoke指定项目tmp：
 
 ```bash
-conda activate llm-efficiency
+conda activate mapika
 TOKENIZERS_PARALLELISM=false HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
 setsid --wait python -B -u experiments/jev_train/scripts/sample_stats.py \
   --samples experiments/jev_train/outputs/samples_20261015_175031
@@ -311,7 +311,7 @@ setsid --wait /data/wangsq/software/miniconda3/envs/mapika/bin/python -B -u scri
 
 ## 数据机制交叉审计
 
-`scripts/analyze_training_mechanism.py`按`configs/analysis_training_mechanism.json`只读B2-8k、R00、R01、R11及B2-38k的实际选样、原始教师轨迹和训练日志；不改数据、不推理、不训练。环境使用有Parquet读取依赖的`llm-efficiency`，显式禁用CUDA。
+`scripts/analyze_training_mechanism.py`按`configs/analysis_training_mechanism.json`只读B2-8k、R00、R01、R11及B2-38k的实际选样、原始教师轨迹和训练日志；不改数据、不推理、不训练。环境使用已含Parquet读取依赖的`mapika`，显式禁用CUDA。
 
 - 来源、教师、领域分别用`dataset`、`model`和既有任务组领域标签。规范化gold以实际train.jsonl为准，逐ID核对C1恢复表；保留/新增/移除按配置中五对ID集合报告。
 - 严格短停复用`analyze_short_turn.classify`：仅当前规范化RESPOND、后继新用户、本轮此前调用1–3次；明确error/length及终止冲突排除，missing/null终止信息保留并单列。训练`short_turn`标签另报，不能当停止正例数。
@@ -321,7 +321,7 @@ setsid --wait /data/wangsq/software/miniconda3/envs/mapika/bin/python -B -u scri
 
 ```bash
 CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 \
-  /data/wangsq/software/miniconda3/envs/llm-efficiency/bin/python -B -u \
+  /data/wangsq/software/miniconda3/envs/mapika/bin/python -B -u \
   experiments/jev_train/scripts/analyze_training_mechanism.py \
   --out "experiments/jev_train/outputs/analysis_training_mechanism_<新标识>"
 ```

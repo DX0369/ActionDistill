@@ -78,22 +78,29 @@ def checked_revision(api, dataset, revision):
     return revision
 
 
-def upload_revision(api, dataset, result):
-    if isinstance(result, list):
-        if not result:
-            raise ValueError('dataset upload did not return any commits')
-        result = result[-1]
-    return checked_revision(api, dataset, result.oid)
+def upload_revision(api, dataset, expected_files):
+    # ModelScope 1.34.0 can return an empty commit oid after a successful upload.
+    # Bind the dataset's canonical revision to the complete uploaded content.
+    revision = checked_revision(api, dataset, api.dataset_info(dataset).sha)
+    remote = {item['Path']: item for item in api.get_dataset_files(
+        dataset, revision=revision, recursive=True, page_size=100) if item['Type'] == 'blob'}
+    for name, expected in expected_files.items():
+        if (name not in remote or remote[name]['Size'] != expected['size_bytes']
+                or remote[name]['Sha256'] != expected['sha256']):
+            raise ValueError(f'uploaded dataset file missing or differs at {revision}: {name}')
+    return revision
 
 
 def publish_data(pool, dataset):
     manifest = completed_pool(pool)
+    from jev_train.portable_pool import file_identity
+    files = {**manifest['files'], **{name: file_identity(pool/name) for name in
+             ('manifest.json', 'metadata/command.txt', 'metadata/run_status.json')}}
     api, token = private_hub(dataset)
-    files = [*manifest['files'], 'manifest.json', 'metadata/command.txt', 'metadata/run_status.json']
-    result = api.upload_folder(repo_id=dataset, repo_type='dataset', folder_path=str(pool), path_in_repo='',
-                               allow_patterns=files, token=token,
-                               commit_message='Publish verified frozen Jev selection pool')
-    print('Private dataset:', dataset, 'revision:', upload_revision(api, dataset, result))
+    api.upload_folder(repo_id=dataset, repo_type='dataset', folder_path=str(pool), path_in_repo='',
+                      allow_patterns=list(files), token=token,
+                      commit_message='Publish verified frozen Jev selection pool')
+    print('Private dataset:', dataset, 'revision:', upload_revision(api, dataset, files))
 
 
 def main():

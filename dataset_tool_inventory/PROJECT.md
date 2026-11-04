@@ -1,6 +1,6 @@
 # 数据集工具清单项目
 
-更新时间：2026-11-04 14:24 CST +0800。
+更新时间：2026-11-04 18:11 CST +0800。
 
 ## 目标与组织
 
@@ -12,7 +12,7 @@
 
 ## 环境与运行
 
-使用 `llm-efficiency` 环境及 pyarrow、ijson、transformers、tokenizers。长度估算只读取 `/data/wangsq/model/Mapika-decider-0.8b` tokenizer，不加载模型或联网；审查 JSON 的估算长度不等于最终训练 prompt 长度。
+使用本机 `mapika`（train-runner角色）及 pyarrow、ijson、transformers、tokenizers；新机解释器和安装见[迁移说明](../migration/README.md)。长度估算只读取 `/data/wangsq/model/Mapika-decider-0.8b` tokenizer，不加载模型或联网；审查 JSON 的估算长度不等于最终训练 prompt 长度。
 
 正式扫描由用户启动，必须使用独立新输出目录；smoke 使用独立 `tmp/`。退出码 0、进程结束、结构准入、G3 通过和全量覆盖分别判断。不得改写原始输入、正式审查、G3 明细、已有样本或历史结果；整理文档不授权扫描、复审、样本构造或训练。
 

@@ -18,4 +18,5 @@ holidays
 pytz
 roman
 sympy
+soundfile
 modelscope==1.34.0
