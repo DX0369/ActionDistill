@@ -1,0 +1,23 @@
+{
+  "DeepSeek-v4-Pro-Agent": 229,
+  "GLM-5.2-Agent": 120,
+  "GPT-5.5-Codex": 229,
+  "Kimi-K3-Codex": 4,
+  "Open-SWE-Traces": 170,
+  "Toolathlon-Trajectories": 152,
+  "WildClawBench-Trajectories": 44,
+  "ZClawBench": 74,
+  "claude-fable-5-claude-code-traces": 22,
+  "deepseek-v4-pro-0813-agentic": 138,
+  "fable-5-claude-code-traces": 5,
+  "finance-agents-benchmark-traces": 29,
+  "gpt-5.5-agent": 23,
+  "gpt-5.6-sol-coding-and-debugging-traces": 2,
+  "hermes-agent-reasoning-traces": 229,
+  "kimi-k2.6-claude-code-traces": 10,
+  "mimo-claude-code-traces-1k": 32,
+  "minimax-m3-claude-code-traces": 9,
+  "mle-trajectories": 23,
+  "swe-rebench-v2-glm-5.1-pi-traces": 229,
+  "unified-agent-trajectories": 227
+}

@@ -1,0 +1,14 @@
+{
+  "canonical_states": "outputs/curation_preview_B2dedup_8k_20261028_102810/metadata/canonical_states.jsonl",
+  "state_features": "outputs/analysis_data_curation_20261025_2203/state_features.jsonl",
+  "domains": "outputs/domain_labels_20261029_020627/labels.jsonl",
+  "build_config": "configs/build_pool.json",
+  "runs": {
+    "B2_8k": "outputs/runs/jev_2b_B2_8k_lr1e-5_20261026_000026",
+    "R00": "outputs/runs/jev_2b_B2balance_R00_8k_lr1e-5_20261029_152021",
+    "R01": "outputs/runs/jev_2b_B2balance_R01_8k_lr1e-5_20261030_105946",
+    "R11": "outputs/runs/jev_2b_B2balance_R11_8k_lr1e-5_20261030_105946",
+    "B2_38k": "outputs/runs/jev_2b_B2_38k_lr1e-5_gpu45_20261028_024919"
+  },
+  "pairs": [["R00", "B2_8k"], ["R01", "R00"], ["R11", "R00"], ["R11", "R01"], ["B2_38k", "B2_8k"]]
+}

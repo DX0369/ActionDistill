@@ -1,0 +1,31 @@
+{
+  "benchmark": {
+    "name": "bfcl",
+    "path": "third_party/gorilla/berkeley-function-call-leaderboard",
+    "commit": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8"
+  },
+  "output_root": "tmp",
+  "task_ids": {
+    "multi_turn_base": ["multi_turn_base_0", "multi_turn_base_1"],
+    "multi_turn_miss_func": ["multi_turn_miss_func_0", "multi_turn_miss_func_1"],
+    "multi_turn_miss_param": ["multi_turn_miss_param_0", "multi_turn_miss_param_1"],
+    "multi_turn_long_context": ["multi_turn_long_context_100", "multi_turn_long_context_101"]
+  },
+  "trials": 1,
+  "seed": 20261015,
+  "executors": {
+    "qwen4b": {
+      "base_url": "http://127.0.0.1:8001/v1",
+      "model": "qwen3-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {"rope_type": "yarn", "factor": 4.0, "original_max_position_embeddings": 32768},
+      "thinking": {"temperature": 0.6, "top_p": 0.95, "top_k": 20, "min_p": 0}
+    }
+  },
+  "advisors": {},
+  "conditions": {"native": {"executor": "qwen4b", "advice": "none"}},
+  "comparisons": []
+}

@@ -1,0 +1,180 @@
+{
+  "benchmark": {
+    "name": "stabletoolbench",
+    "path": "third_party/StableToolBench",
+    "commit": "aa4ed9f4737ad98bd706663f01d63623c3427812"
+  },
+  "output_root": "tmp",
+  "task_ids": {
+    "G1_instruction": [
+      "25658"
+    ],
+    "G1_category": [
+      "28"
+    ],
+    "G1_tool": [
+      "394"
+    ],
+    "G2_instruction": [
+      "1643"
+    ],
+    "G2_category": [
+      "43"
+    ],
+    "G3_instruction": [
+      "455"
+    ]
+  },
+  "trials": 1,
+  "seed": 20261015,
+  "executors": {
+    "qwen3_4b": {
+      "base_url": "http://127.0.0.1:8001/v1",
+      "model": "qwen3-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    },
+    "actionopd_4b": {
+      "base_url": "http://127.0.0.1:8005/v1",
+      "model": "actionopd-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B-ActionOPD-DeepSeek-V4-Flash",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    },
+    "star_4b": {
+      "base_url": "http://127.0.0.1:8006/v1",
+      "model": "star-4b",
+      "model_path": "/data/wangsq/model/STAR-4b",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    }
+  },
+  "advisors": {
+    "ours_jev": {
+      "base_url": "http://127.0.0.1:18767",
+      "timeout_seconds": 120,
+      "model": "/data/wangsq/code/ActionDistill/experiments/jev_train/outputs/runs/jev_2b_A_38k_lr1e-5_20261022_192915/model",
+      "temperature_file": "/data/wangsq/code/ActionDistill/experiments/jev_train/outputs/evals/2b_A_38k_lr1e-5_20261022_192915/temperature.json",
+      "type": "jev_local"
+    },
+    "typesafe": {
+      "type": "typesafe",
+      "base_url": "https://api.typesafe.ai/v1",
+      "model": "jev-1.14.0",
+      "api_key_env": "TYPESAFE_API_KEY",
+      "timeout_seconds": 120,
+      "render_advisor": "ours_jev"
+    },
+    "deepseek": {
+      "type": "deepseek",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-flash",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "timeout_seconds": 600,
+      "max_tokens": 16384,
+      "reasoning_effort": "high"
+    }
+  },
+  "conditions": {
+    "native": {
+      "executor": "qwen3_4b",
+      "advice": "none"
+    },
+    "official_jev": {
+      "executor": "qwen3_4b",
+      "advice": "prefer",
+      "advisor": "typesafe"
+    },
+    "ours": {
+      "executor": "qwen3_4b",
+      "advice": "gate",
+      "advisor": "ours_jev",
+      "gate": {
+        "rule": "respond_prob_ge",
+        "threshold": 0.1,
+        "loop_guard": true
+      }
+    },
+    "actionopd": {
+      "executor": "actionopd_4b",
+      "advice": "none"
+    },
+    "deepseek_advisor": {
+      "executor": "qwen3_4b",
+      "advice": "prefer",
+      "advisor": "deepseek"
+    },
+    "star": {
+      "executor": "star_4b",
+      "advice": "none"
+    }
+  },
+  "comparisons": [],
+  "protocol": {
+    "mode": "smoke",
+    "cache_archive": "/data/wangsq/code/ActionDistill/experiments/jev_bench/data/StableToolBench/server_cache.zip",
+    "backend": {
+      "toolbench_url": "http://8.130.32.149:8080/rapidapi",
+      "toolbench_key_env": "TOOLBENCH_KEY",
+      "timeout_seconds": 120,
+      "simulator": {
+        "base_url": "https://api.deepseek.com",
+        "model": "deepseek-flash",
+        "api_key_env": "DEEPSEEK_API_KEY",
+        "thinking": "disabled",
+        "timeout_seconds": 120,
+        "temperature": 0,
+        "max_tokens": 1024
+      }
+    },
+    "judge": {
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-flash",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "thinking": "disabled",
+      "timeout_seconds": 120,
+      "temperature": 0.2,
+      "max_tokens": 1000
+    },
+    "judge_repeats": 3,
+    "single_chain_max_step": 12,
+    "max_observation_length": 1024
+  }
+}

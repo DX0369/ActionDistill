@@ -1,0 +1,23 @@
+{
+  "model": "/data/wangsq/model/Mapika-decider-0.8b",
+  "epochs": 1.0,
+  "lr": 1e-05,
+  "wd": 0.0,
+  "warmup": 150,
+  "max_tokens": 32768,
+  "accum": 2,
+  "max_len": 32768,
+  "max_options": 255,
+  "brier_w": 0.0,
+  "label_smooth": 0.0,
+  "none_prob": 0.0,
+  "schema_first_prob": 0.0,
+  "eval_every": 100,
+  "monitor_val_size": 300,
+  "save_every": 100,
+  "seed": 20261015,
+  "swanlab_mode": "cloud",
+  "train_limit": 2000,
+  "max_steps": 0,
+  "activation_checkpointing": "on"
+}

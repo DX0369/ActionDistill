@@ -1,0 +1,7 @@
+{
+  "balance_preview": "outputs/curation_preview_B2balance_8k_20261029_141658",
+  "r11_samples": "outputs/samples_curated_B2balance_R11_8k_20261029_141859",
+  "reply_origin_preview": "outputs/curation_preview_task_reply_20261103_171530",
+  "seed": 20261015,
+  "counts": [8000, 38000, 76000]
+}

@@ -1,0 +1,68 @@
+{
+  "benchmark": {
+    "name": "tau2",
+    "path": "third_party/tau2-bench-verified",
+    "commit": "3d82db8f3579efe29609ab9daff058a9b7cb187c"
+  },
+  "output_root": "tmp",
+  "task_ids": {
+    "retail": [
+      "0"
+    ],
+    "airline": [
+      "0"
+    ],
+    "telecom": [
+      "[mms_issue]airplane_mode_on|bad_network_preference|bad_wifi_calling|break_apn_mms_setting|break_app_both_permissions|data_mode_off|data_usage_exceeded|unseat_sim_card|user_abroad_roaming_disabled_off[PERSONA:Hard]"
+    ]
+  },
+  "trials": 1,
+  "seed": 20261015,
+  "executors": {
+    "qwen3_4b": {
+      "base_url": "http://127.0.0.1:8001/v1",
+      "model": "qwen3-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    }
+  },
+  "advisors": {},
+  "conditions": {
+    "pa_tool": {
+      "executor": "qwen3_4b",
+      "advice": "none",
+      "pa_tool_mapping": "/data/wangsq/code/ActionDistill/experiments/jev_bench/outputs/pa_tool_prepare_tau2_REPLACE_ME/mapping.json"
+    }
+  },
+  "comparisons": [],
+  "protocol": {
+    "split": "base",
+    "max_steps": 200,
+    "max_errors": 10,
+    "evaluation_type": "ALL",
+    "solo_mode": false,
+    "validate_communication": false
+  },
+  "user_simulator": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "api_key_env": "DEEPSEEK_API_KEY",
+    "temperature": 0.0,
+    "max_tokens": 8192,
+    "thinking": "disabled",
+    "timeout_seconds": 120
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "benchmark": {
+    "name": "apibank",
+    "path": "third_party/DAMO-ConvAI/api-bank",
+    "commit": "faf754671f5b850e1b4d1ff870db37a6a2480df6"
+  },
+  "output_root": "tmp",
+  "task_ids": {
+    "level_1_api": [
+      "[\"ModifyRegistration-QueryHealthData-CancelRegistration-level-2-2.jsonl\",0]"
+    ],
+    "level_1_response": [
+      "[\"ModifyRegistration-QueryHealthData-CancelRegistration-level-2-2.jsonl\",1]"
+    ],
+    "level_2_api": [
+      "[\"QueryHistoryToday-level-3-3.jsonl\",0]"
+    ],
+    "level_2_response": [
+      "[\"QueryHistoryToday-level-3-3.jsonl\",3]"
+    ],
+    "level_3_api": [
+      "[0,0]"
+    ],
+    "level_3_response": [
+      "[0,4]"
+    ]
+  },
+  "trials": 1,
+  "seed": 20261015,
+  "executors": {
+    "qwen4b": {
+      "base_url": "http://127.0.0.1:8001/v1",
+      "model": "qwen3-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    }
+  },
+  "advisors": {},
+  "conditions": {
+    "native": {
+      "executor": "qwen4b",
+      "advice": "none"
+    }
+  },
+  "comparisons": [],
+  "protocol": {
+    "mode": "cpu_only",
+    "data_root": "/data/wangsq/code/ActionDistill/experiments/jev_bench/data/API-Bank/test-data",
+    "retriever_model_path": "/data/wangsq/model/paraphrase-MiniLM-L3-v2"
+  }
+}

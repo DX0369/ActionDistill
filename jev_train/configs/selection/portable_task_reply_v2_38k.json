@@ -1,0 +1,8 @@
+{
+  "recipe": "task_reply_v2",
+  "count": 38000,
+  "seed": 20261015,
+  "domain_uniform_mix": 0.5,
+  "source_weight_power": 0.5,
+  "reply_priority_weight": 2
+}

@@ -1,0 +1,83 @@
+{
+  "benchmark": {
+    "name": "toolhop",
+    "path": "third_party/ToolHop",
+    "commit": "b439d7279af359fda46e8117ae4f0245b75f5c6b"
+  },
+  "output_root": "tmp",
+  "task_ids": {
+    "tasks": [
+      "0",
+      "44"
+    ]
+  },
+  "trials": 1,
+  "seed": 20261015,
+  "executors": {
+    "qwen4b": {
+      "base_url": "http://127.0.0.1:8001/v1",
+      "model": "qwen3-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    }
+  },
+  "advisors": {
+    "a38k": {
+      "base_url": "http://127.0.0.1:18767",
+      "timeout_seconds": 120,
+      "model": "/data/wangsq/code/ActionDistill/experiments/jev_train/outputs/runs/jev_2b_A_38k_lr1e-5_20261022_192915/model",
+      "temperature_file": "/data/wangsq/code/ActionDistill/experiments/jev_train/outputs/evals/2b_A_38k_lr1e-5_20261022_192915/temperature.json",
+      "type": "jev_local"
+    }
+  },
+  "conditions": {
+    "native": {
+      "executor": "qwen4b",
+      "advice": "none"
+    },
+    "prefer": {
+      "executor": "qwen4b",
+      "advice": "prefer",
+      "advisor": "a38k"
+    },
+    "G1": {
+      "executor": "qwen4b",
+      "advice": "gate",
+      "advisor": "a38k",
+      "gate": {
+        "rule": "respond_prob_ge",
+        "threshold": 0.1,
+        "loop_guard": true
+      }
+    },
+    "G2": {
+      "executor": "qwen4b",
+      "advice": "gate",
+      "advisor": "a38k",
+      "gate": {
+        "rule": "top1_prob_lt",
+        "threshold": 0.3,
+        "loop_guard": true
+      }
+    }
+  },
+  "comparisons": [],
+  "protocol": {
+    "mode": "smoke",
+    "scenario": "Free",
+    "max_turns": 9
+  }
+}

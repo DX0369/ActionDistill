@@ -1,0 +1,42 @@
+# Experiment outputs and temporary diagnostics
+**/tmp/
+**/outputs/
+**/runs/
+**/logs/
+**/artifacts/
+**/data/
+**/datasets/
+
+# Local environments and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Model weights and large binary artifacts
+**/models/
+**/checkpoints/
+**/weights/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Common local/editor files
+.DS_Store
+*.swp
+*.swo
+*.log

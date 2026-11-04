@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "candidates": 16,
+  "minimum_valid_candidates": 12,
+  "temperature": 0.4,
+  "reference_temperature": 0,
+  "alpha": 0.2,
+  "top_p": 1,
+  "top_k": -1,
+  "min_p": 0,
+  "max_tokens": 8192,
+  "seed": 20261015,
+  "enable_thinking": true,
+  "parameter_context": "selected_tool_alias",
+  "unresolved": "stop",
+  "candidate_failure": "exclude_length_or_invalid_final_name",
+  "complete_all_slots": true,
+  "density": "neighbors_over_valid_candidates_minus_one",
+  "generation_failure": "original_name_on_invalid_reference_or_insufficient_candidates",
+  "tie_break": {
+    "source": "user_approved_project_supplement_not_paper",
+    "candidate_order": [
+      "density_desc",
+      "reference_distance_asc",
+      "first_sample_slot_asc"
+    ],
+    "equal_density_tool_collision": "original_tool_order",
+    "equal_density_parameter_collision": "original_property_order"
+  },
+  "toolhop_array_description": "items.description_when_top_level_missing",
+  "toolhop_descendant_description": "properties_items_depth_first_original_order_newline",
+  "apibank_duplicate_description": "shared_alias_from_instruction",
+  "stable_empty_parameter_description": "empty_text_with_tool_context",
+  "toolsandbox_hidden_description": "preserve_current_visible_name"
+}

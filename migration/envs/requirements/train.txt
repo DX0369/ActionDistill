@@ -1,0 +1,8 @@
+torch
+transformers
+flash-linear-attention[cuda]
+causal-conv1d
+numpy
+huggingface-hub
+jinja2
+swanlab

@@ -1,0 +1,7 @@
+numpy
+openai
+httpx
+pydantic
+requests
+PyYAML
+tenacity

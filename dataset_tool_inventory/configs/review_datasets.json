@@ -1,0 +1,546 @@
+{
+  "datasets": [
+    {
+      "name": "hermes-agent-reasoning-traces",
+      "path": "hermes-agent-reasoning-traces",
+      "review_adapter": "hermes",
+      "storage": "parquet",
+      "glob": "data/*/train.parquet",
+      "tools_field": "tools",
+      "harness": "hermes-agent",
+      "file_model_map": {
+        "data/kimi/train.parquet": "moonshotai/Kimi-K2.5",
+        "data/glm-5.1/train.parquet": "zai-org/GLM-5.1-FP8"
+      },
+      "model_source": "README.md:33-39; config directory",
+      "candidate_complete": false,
+      "candidate_source": "record.tools; lifecycle not captured",
+      "strip_think": true,
+      "notes": "只扫描 kimi/glm-5.1 配置，根目录 default parquet 是重复视图。S 指结构，不代表逐步生命周期已证明。 task 是任务描述，不能冒充 task_id。",
+      "source_record_id_field": "id"
+    },
+    {
+      "name": "agent-llm-traces-v1",
+      "path": "agent-llm-traces-v1",
+      "review_adapter": "unresolved",
+      "harness": "OTel",
+      "reason": "受测 agent 与用户模拟器/judge span 无已确认区分规则，不能将全部 chat span 计为教师步骤。",
+      "notes": "README.md:126-142；模拟器样本为 GPT-4.1。"
+    },
+    {
+      "name": "agent-llm-traces-v2",
+      "path": "agent-llm-traces-v2",
+      "review_adapter": "unresolved",
+      "storage": "parquet",
+      "glob": "data/train/*.parquet",
+      "harness": "OTel",
+      "candidate_complete": true,
+      "candidate_source": "current span gen_ai.tool.definitions",
+      "outcome": {
+        "field": "success",
+        "values": [
+          {
+            "value": true,
+            "outcome": "success"
+          },
+          {
+            "value": false,
+            "outcome": "failure"
+          }
+        ]
+      },
+      "check_tau2_retail": true,
+      "notes": "每个 chat span 一步；输入与输出分开；output=null 记 UNKNOWN，不能从之后请求历史补标签。",
+      "harness_field": "harness",
+      "source_record_id_field": "session_id",
+      "reason": "chat span 中混有非受测 agent 的辅助调用（tool_calling_with_shortlisting 的 shortlister、Claude Code 内部 bash 前缀检测与路径抽取），会被误计为教师 RESPOND；受测 agent span 的识别规则确认前隔离。"
+    },
+    {
+      "name": "WildClawBench-Trajectories",
+      "path": "WildClawBench-Trajectories",
+      "review_adapter": "native_pi",
+      "glob": "sessions/**/*.jsonl",
+      "harness": "openclaw",
+      "candidate_complete": false,
+      "notes": "按每条 assistant.message.model；无候选声明的状态用先前调用 I。train.parquet 有图像 hash 占位，使用 sessions。",
+      "native_header_harness_field": "harness",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "Toolathlon-Trajectories",
+      "path": "Toolathlon-Trajectories",
+      "review_adapter": "toolathlon",
+      "storage": "jsonl",
+      "glob": "*.jsonl",
+      "task_field": "task_name",
+      "model_field": "modelname_run",
+      "harness": "Toolathlon",
+      "candidate_complete": false,
+      "candidate_source": "record.tool_calls.tools; task-level snapshot",
+      "task_outcome": {
+        "field": "evaluation",
+        "values": [
+          {
+            "value": true,
+            "outcome": "success"
+          },
+          {
+            "value": false,
+            "outcome": "failure"
+          },
+          {
+            "value": null,
+            "outcome": "unknown"
+          }
+        ]
+      },
+      "quality_flags": [
+        "teacher_run_label_not_verified_api_id"
+      ],
+      "notes": "顶层 tool_calls 是声明容器；不是实际调用。config.system_prompts.agent 必须加入历史。"
+    },
+    {
+      "name": "sapientai-opus-5-tau2-trajectories",
+      "path": "sapientai-opus-5-tau2-trajectories",
+      "review_adapter": "tau2",
+      "storage": "tau2",
+      "glob": "trajectories/*.json",
+      "task_field": "task_id",
+      "model_field": "_info.agent_info.llm",
+      "harness": "psai_agent",
+      "candidate_complete": false,
+      "outcome": {
+        "field": "reward_info.reward",
+        "values": [
+          {
+            "value": 0,
+            "outcome": "failure"
+          },
+          {
+            "value": 1,
+            "outcome": "success"
+          }
+        ],
+        "value_type": "number"
+      },
+      "check_tau2_retail": true,
+      "quality_flags": [
+        "raw_api_model_unavailable"
+      ],
+      "notes": "SapientAI-Agent-Opus-5 是 scaffold 标签，暂不精确映射 Claude API。tool_defs=null 为 I；保留 reward 0 的失败。",
+      "harness_field": "_info.agent_info.implementation",
+      "domain_field": "_info.environment_info.domain_name",
+      "source_record_id_field": "id",
+      "candidate_reconstruction": "harness_union",
+      "tau2_official_tools": "/data/wangsq/code/ActionDistill/experiments/dataset_tool_inventory/configs/tau2_agent_tools.json"
+    },
+    {
+      "name": "deepseek-v4-pro-0813-agentic",
+      "path": "deepseek-v4-pro-0813-agentic",
+      "review_adapter": "openai",
+      "storage": "jsonl",
+      "glob": "raw/canonical.jsonl",
+      "model_field": "teacher_model",
+      "messages_field": "messages",
+      "tools_field": "tools",
+      "harness": null,
+      "candidate_complete": true,
+      "candidate_source": "record.tools frozen snapshot",
+      "outcome": {
+        "field": "verifier_passed",
+        "values": [
+          {
+            "value": true,
+            "outcome": "success"
+          },
+          {
+            "value": false,
+            "outcome": "failure"
+          }
+        ]
+      },
+      "notes": "reasoning_present=true 与抽样 assistant 无思考字段冲突；不凭标记创造 reasoning。",
+      "harness_source": "未记录框架名称；README 仅描述 synthetic sandbox",
+      "domain_field": "domain",
+      "source_record_id_field": "id"
+    },
+    {
+      "name": "ZClawBench",
+      "path": "ZClawBench",
+      "review_adapter": "anthropic",
+      "storage": "parquet",
+      "glob": "train.parquet",
+      "task_field": "task_id",
+      "model_field": "model_name",
+      "harness": "openclaw",
+      "candidate_complete": false,
+      "notes": "教师为展示标签，精确映射仍需配置证据；无声明时 I；mock 工具环境。",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "finance-agents-benchmark-traces",
+      "path": "finance-agents-benchmark-traces",
+      "review_adapter": "finance",
+      "storage": "parquet",
+      "glob": "data/*.parquet",
+      "task_field": "task_id",
+      "model_field": "model",
+      "harness": "finance-agents",
+      "candidate_complete": false,
+      "outcome": {
+        "field": "all_pass",
+        "values": [
+          {
+            "value": true,
+            "outcome": "success"
+          },
+          {
+            "value": false,
+            "outcome": "failure"
+          }
+        ]
+      },
+      "quality_flags": [
+        "system_prompt_body_unavailable"
+      ],
+      "notes": "不使用 judge_model。system_prompt_sha256 不等于 system 正文；候选 I。",
+      "source_record_id_field": "run_id",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "fable5-gpt5.5-opus4.7-mixed-traces",
+      "path": "fable5-gpt5.5-opus4.7-mixed-traces",
+      "review_adapter": "unresolved",
+      "harness": "mixed",
+      "reason": "文件为异构切片；缺少可靠 teacher 字段和统一当前动作边界；judge_model 不能代替 teacher。",
+      "notes": "qwen3.7-max 不在当前已确认名单；文件名不能替代 teacher_model。"
+    },
+    {
+      "name": "swe_rebench_07_2026_trajectories",
+      "path": "swe_rebench_07_2026_trajectories",
+      "review_adapter": "unresolved",
+      "harness": "multi-scaffold",
+      "reason": "不同 scaffold 事件边界未统一，Junie agent_step 缺工具边界；evaluation_matches_selected 语义待核，先保留格式档案。",
+      "notes": "participant.model/scaffold、evaluation.resolved、prompts/events 为 canonical。"
+    },
+    {
+      "name": "claude-fable-5-claude-code-traces",
+      "path": "claude-fable-5-claude-code-traces",
+      "review_adapter": "native_claude",
+      "glob": "**/*.jsonl",
+      "harness": "claude-code",
+      "candidate_complete": false,
+      "candidate_source": "README.md JSON schema snapshot (dataset N)",
+      "snapshot_json_block": {
+        "file": "README.md",
+        "index": 0
+      },
+      "notes": "51 名工具 snapshot；按 message.id 合并跨行片段，冻结第一次片段前输入。deferred/MCP 生命周期未证明。"
+    },
+    {
+      "name": "Fable-5-Cursor-Traces",
+      "path": "Fable-5-Cursor-Traces",
+      "review_adapter": "openai",
+      "storage": "jsonl",
+      "glob": "train.jsonl",
+      "model_constant": "claude-fable-5",
+      "model_source": "README.md:12; system powered by Fable 5",
+      "harness": "cursor",
+      "messages_field": "messages",
+      "tools_field": "tools",
+      "candidate_complete": false,
+      "candidate_source": "record.tools; reconstructed permissive schemas",
+      "notes": "重建 schema 不是捕获请求的精确工具契约。",
+      "candidate_level": "N",
+      "source_record_id_field": "metadata.session_id"
+    },
+    {
+      "name": "fable-5-claude-code-traces",
+      "path": "fable-5-claude-code-traces",
+      "review_adapter": "native_claude",
+      "glob": "**/*.jsonl",
+      "harness": "claude-code",
+      "candidate_complete": false,
+      "notes": "<synthetic> 不是教师；作为未映射模型保留记录，排除准入。",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "mimo-claude-code-traces-1k",
+      "path": "mimo-claude-code-traces-1k",
+      "review_adapter": "native_claude",
+      "glob": "session/**/*.jsonl",
+      "harness": "claude-code-reassembled",
+      "candidate_complete": false,
+      "notes": "README.md:176-179 列 24 工具名但抽样无 per-request schema。本轮先用 I，不凭宣传补完整集合。",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "gpt-5.5-agent",
+      "path": "gpt-5.5-agent",
+      "review_adapter": "native_codex",
+      "glob": "*.jsonl",
+      "harness": "codex",
+      "candidate_complete": false,
+      "notes": "用户确认 response_item 原子步骤；README apply_patch/bash 与 exec_command 调用冲突，不继承该 snapshot，使用 I。",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "GLM-5.2-Agent",
+      "path": "GLM-5.2-Agent",
+      "review_adapter": "native_pi",
+      "glob": "*.jsonl",
+      "harness": "pi",
+      "candidate_complete": false,
+      "snapshot_json_block": {
+        "file": "README.md",
+        "index": 1
+      },
+      "candidate_source": "README.md:71 snapshot (dataset N)",
+      "notes": "message.model 与 responseModel 分开，不静默替换；6 工具名称不合并别名。"
+    },
+    {
+      "name": "Kimi-K3-Codex",
+      "path": "Kimi-K3-Codex",
+      "review_adapter": "native_codex",
+      "glob": "*.jsonl",
+      "harness": "codex",
+      "candidate_complete": false,
+      "snapshot_json_block": {
+        "file": "README.md",
+        "index": 1
+      },
+      "candidate_source": "README.md:71 snapshot (dataset N)",
+      "notes": "轨迹级 session tool_schema 优先于 README snapshot，两者均为 N 恢复来源；候选完整性及逐请求可见时段未证明，保留现有候选优先级。"
+    },
+    {
+      "name": "kimi-k2.6-claude-code-traces",
+      "path": "kimi-k2.6-claude-code-traces",
+      "review_adapter": "native_claude",
+      "glob": "*.jsonl",
+      "harness": "claude-code",
+      "candidate_complete": false,
+      "notes": "只使用此前工具调用 I；保留失败发布限制为来源属性，outcome 不从中推定。",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "minimax-m3-claude-code-traces",
+      "path": "minimax-m3-claude-code-traces",
+      "review_adapter": "native_claude",
+      "glob": "*.jsonl",
+      "harness": "claude-code",
+      "candidate_complete": false,
+      "notes": "只有工具返回 is_error 不足以推定任务 failure。",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "swe-rebench-v2-glm-5.1-pi-traces",
+      "path": "swe-rebench-v2-glm-5.1-pi-traces",
+      "review_adapter": "openai",
+      "storage": "parquet",
+      "glob": "data/*.parquet",
+      "task_field": "task_id",
+      "model_constant": "GLM-5.1",
+      "model_source": "README.md:27",
+      "harness": "pi",
+      "messages_field": "messages",
+      "tools_field": "tools",
+      "candidate_complete": true,
+      "candidate_source": "record.tools",
+      "notes": "README successful-only 是数据集声明，行级 outcome 未提供，保持 unknown。"
+    },
+    {
+      "name": "Open-SWE-Traces",
+      "path": "Open-SWE-Traces",
+      "review_adapter": "openai",
+      "storage": "parquet",
+      "glob": "data/openhands/deepseek_v4_flash_0731/**/*.parquet",
+      "task_field": "instance_id",
+      "model_field": "metadata.teacher_model.name",
+      "harness": "openhands",
+      "messages_field": "messages",
+      "tools_field": "tools",
+      "candidate_complete": true,
+      "candidate_source": "record.tools",
+      "outcome": {
+        "field": "resolved",
+        "values": [
+          {
+            "value": 1,
+            "outcome": "success"
+          },
+          {
+            "value": 0,
+            "outcome": "failure"
+          },
+          {
+            "value": -1,
+            "outcome": "unknown"
+          }
+        ]
+      },
+      "notes": "保留显式 think 工具及 thought 参数（用户确认），仅剔除独立 reasoning。无 tool_call_id 的返回仅保留有序内容，不伪造配对。",
+      "source_record_id_field": "trajectory_id"
+    },
+    {
+      "name": "ToolACE",
+      "path": "ToolACE/data.json",
+      "review_adapter": "excluded",
+      "storage": "json_array",
+      "glob": "*",
+      "harness": "toolace",
+      "candidate_complete": true,
+      "candidate_source": "system standard JSON declaration",
+      "notes": "无明确 teacher 字段，不满足精确白名单；依然盘点并显式计入 teacher_missing。",
+      "reason": "用户确认排除：README 与数据均未说明生成数据所用的教师模型，无法满足教师白名单。"
+    },
+    {
+      "name": "unified-agent-trajectories",
+      "path": "unified-agent-trajectories",
+      "review_adapter": "openai",
+      "storage": "jsonl",
+      "glob": "wildclawbench/**/data.jsonl",
+      "task_field": "_meta.task_id",
+      "model_field": "_meta.source_model_id",
+      "harness": "openclaw-unified",
+      "messages_field": "messages",
+      "tools_field": "tools",
+      "candidate_complete": false,
+      "candidate_source": "record.tools; registry/inferred provenance",
+      "notes": "不把 permissive inferred schema 当运行时完整请求；连续 score 没有确认成功阈值，outcome unknown。",
+      "harness_field": "_meta.agent_harness",
+      "candidate_level": "N",
+      "source_record_id_field": "_meta.trajectory_id"
+    },
+    {
+      "name": "DeepSeek-v4-Pro-Agent",
+      "path": "DeepSeek-v4-Pro-Agent",
+      "review_adapter": "native_pi",
+      "glob": "*.jsonl",
+      "harness": "pi",
+      "candidate_complete": false,
+      "candidate_source": "developer Available tools declaration (N); prompt states other custom tools may exist",
+      "notes": "实际developer声明 read/bash/edit/write 优先；README snapshot 冲突不替代。"
+    },
+    {
+      "name": "GPT-5.5-Codex",
+      "path": "GPT-5.5-Codex",
+      "review_adapter": "native_codex",
+      "glob": "*.jsonl",
+      "harness": "codex",
+      "candidate_complete": false,
+      "snapshot_json_block": {
+        "file": "README.md",
+        "index": 1
+      },
+      "candidate_source": "README.md snapshot (dataset N)",
+      "notes": "轨迹级 session tool_schema 优先于 README snapshot，均为 N 恢复来源；候选完整性及逐请求可见时段未证明。"
+    },
+    {
+      "name": "gpt-5.6-sol-coding-and-debugging-traces",
+      "path": "gpt-5.6-sol-coding-and-debugging-traces",
+      "review_adapter": "openai",
+      "storage": "jsonl",
+      "glob": "traces.jsonl",
+      "trajectory_field": "source_trajectory_id",
+      "model_field": "teacher_model",
+      "harness": "codex",
+      "messages_field": "messages",
+      "tools_field": "tools",
+      "target_field": "target_message_index",
+      "candidate_complete": true,
+      "candidate_source": "record.tools",
+      "notes": "严格只用 target_message_index 标签；前缀历史调用不得重复算作当前动作。"
+    },
+    {
+      "name": "mle-trajectories",
+      "path": "mle-trajectories",
+      "review_adapter": "atif",
+      "storage": "json",
+      "glob": "**/agent/trajectory.json",
+      "model_field": "agent.model_name",
+      "harness": "harbor-atif",
+      "candidate_complete": false,
+      "notes": "每步读取 steps.model_name；提交/获奖成功定义未定，outcome unknown。",
+      "harness_field": "agent.name",
+      "source_record_id_field": "session_id",
+      "candidate_reconstruction": "harness_union"
+    },
+    {
+      "name": "mcp-universe-trajectories",
+      "path": "mcp-universe-trajectories",
+      "review_adapter": "excluded",
+      "harness": "mcp-universe",
+      "reason": "用户确认排除：轨迹不保存工具定义，候选只能由此前调用反推；ReAct 子集的历史调用嵌在拼接文本中，候选恒为空，FunctionCall 子集首次使用的工具也不在候选中，有界 smoke 中准入为 0。",
+      "notes": "逐请求 data.messages 为可见历史；ReAct thought/reason 不进入历史。ReAct工具用同数据server::tool区分身份。无外部schema补充，候选仅 I。",
+      "storage": "json",
+      "glob": "trajectories/*.json",
+      "task_field": "task_id",
+      "model_field": "model",
+      "candidate_complete": false,
+      "outcome": {
+        "field": "reward",
+        "value_type": "number",
+        "values": [
+          {
+            "value": 0,
+            "outcome": "failure"
+          },
+          {
+            "value": 1,
+            "outcome": "success"
+          }
+        ]
+      },
+      "domain_field": "domain"
+    },
+    {
+      "name": "FinancialAuditBench-Trajectories",
+      "path": "FinancialAuditBench-Trajectories",
+      "review_adapter": "atif",
+      "storage": "json",
+      "glob": "**/trajectory.json.gz",
+      "model_field": "agent.model_name",
+      "harness": "harbor-atif",
+      "candidate_complete": true,
+      "candidate_source": "agent.tool_definitions",
+      "notes": "抽样唯一 bash，单工具排除；无 grader 明确字段，outcome unknown。",
+      "harness_field": "agent.name",
+      "source_record_id_field": "session_id"
+    },
+    {
+      "name": "finding-the-right-fit",
+      "path": "finding-the-right-fit",
+      "review_adapter": "excluded",
+      "harness": "excluded",
+      "reason": "本地 README 明确禁止训练。"
+    },
+    {
+      "name": "FinancialAuditBench",
+      "path": "FinancialAuditBench",
+      "review_adapter": "excluded",
+      "harness": "excluded",
+      "reason": "原始任务与材料，不是教师轨迹。"
+    },
+    {
+      "name": "astra-robodojo-rollouts",
+      "path": "astra-robodojo-rollouts",
+      "review_adapter": "excluded",
+      "harness": "excluded",
+      "reason": "本轮用户指定排除机器人控制数据。"
+    },
+    {
+      "name": "explicit-edit-benchmark",
+      "path": "explicit-edit-benchmark",
+      "review_adapter": "excluded",
+      "harness": "excluded",
+      "reason": "本轮用户指定排除编辑类基准；已下载版本完整，上游更新不自动同步。"
+    },
+    {
+      "name": "tb21-dsv41-flash-dsh",
+      "path": "tb21-dsv41-flash-dsh",
+      "review_adapter": "excluded",
+      "harness": "excluded",
+      "reason": "本轮用户指定排除；不把附件“只有1条”当已核验事实。"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "format": "actiondistill_migration_v1",
+  "git_checkouts": [
+    {"path": "third_party/gorilla", "source": "https://github.com/ShishirPatil/gorilla.git", "revision": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8", "required_files": ["berkeley-function-call-leaderboard/bfcl_eval/data", "berkeley-function-call-leaderboard/pyproject.toml"]},
+    {"path": "third_party/tau2-bench-verified", "source": "https://github.com/amazon-agi/tau2-bench-verified.git", "revision": "3d82db8f3579efe29609ab9daff058a9b7cb187c", "bundle": "tau2-bench-verified.bundle", "bundle_branch": "actiondistill-retail-item-fix", "required_files": ["src/tau2/domains/retail/tools.py", "data/tau2/domains", "data/tau2/user_simulator"]},
+    {"path": "third_party/ToolSandbox", "source": "https://github.com/apple-aiml-research/ToolSandbox.git", "revision": "c8571d7854316d2e1c5f288e59fe1e34e53f6dd1", "required_files": ["tool_sandbox/scenarios", "pyproject.toml"]},
+    {"path": "third_party/DAMO-ConvAI", "source": "https://github.com/AlibabaResearch/DAMO-ConvAI.git", "revision": "faf754671f5b850e1b4d1ff870db37a6a2480df6", "required_files": ["api-bank/apis", "api-bank/lv3_apis", "api-bank/init_database"]},
+    {"path": "third_party/StableToolBench", "source": "https://github.com/THUNLP-MT/StableToolBench.git", "revision": "aa4ed9f4737ad98bd706663f01d63623c3427812", "required_files": ["solvable_queries/test_instruction", "solvable_queries/test_query_ids"]},
+    {"path": "third_party/decider", "source": "https://github.com/Mapika/decider.git", "revision": "d6fc522aed7fc392576a9b66a330409bc6c382bd", "required_files": ["decider", "pyproject.toml"]}
+  ],
+  "hf_datasets": [
+    {"path": "third_party/ToolHop", "source": "bytedance-research/ToolHop", "revision": "b439d7279af359fda46e8117ae4f0245b75f5c6b", "files": ["README.md", "LICENSE", "requirements.txt", "code/evaluation_closed.py", "code/evaluation_open.py", "data/ToolHop.json"], "metadata_files": ["code/evaluation_closed.py", "data/ToolHop.json"]},
+    {"path": "experiments/jev_bench/data/API-Bank", "source": "liminghao1630/API-Bank", "revision": "12e8158b7628c168f07e8f31fbbe3445e99f44cf", "files": ["test-data/level-1-api.json", "test-data/level-1-response.json", "test-data/level-2-api.json", "test-data/level-2-response.json", "test-data/level-3.json", "test-data/level-3-batch-inf.json", "test-data/level-3-batch-inf-icl.json", "test-data/level-3-batch-inf-response.json"], "metadata_files": ["test-data/level-1-api.json", "test-data/level-1-response.json", "test-data/level-2-api.json", "test-data/level-2-response.json", "test-data/level-3.json", "test-data/level-3-batch-inf.json", "test-data/level-3-batch-inf-icl.json", "test-data/level-3-batch-inf-response.json"]},
+    {"path": "experiments/jev_bench/data/StableToolBench", "source": "stabletoolbench/Cache", "revision": "c6aca0c1cda74d54915eccabb60984dc083fb14c", "files": ["server_cache.zip"], "metadata_files": ["server_cache.zip"], "size_bytes": 235732308}
+  ],
+  "models": [
+    {"path": "Qwen3-4B", "source": "Qwen/Qwen3-4B", "revision": "1cfa9a7208912126459214e8b04321603b3df60c"},
+    {"path": "Mapika-decider-2b", "source": "Mapika/decider-2b", "revision": "ff99089b6810691bd79134ec6febb5d9afa6e619"},
+    {"path": "Qwen3-4B-ActionOPD-DeepSeek-V4-Flash", "source": "nics-efc/Qwen3-4B-ActionOPD-DeepSeek-V4-Flash", "revision": "edc207707325a40e16b7f09940352fd62c34b91a", "revision_evidence": "jev_bench/PROJECT.md; local download metadata unavailable"},
+    {"path": "STAR-4b", "source": "star-lab/STAR-4b", "revision": "cc429add770db952be0d40ec2c23cb63ccdf3ee7"},
+    {"path": "paraphrase-MiniLM-L3-v2", "source": "sentence-transformers/paraphrase-MiniLM-L3-v2", "revision": "4ca70771034acceecb2e72475f72050fcdde4ddc", "exclude": ["onnx/*", "openvino/*", "*.h5", "*.msgpack", "rust_model.ot"]}
+  ],
+  "benchmarks": {
+    "bfcl": {"count": 800, "unit": "task", "resources": ["third_party/gorilla"]},
+    "tau2": {"count": 278, "unit": "task", "resources": ["third_party/tau2-bench-verified"]},
+    "toolhop": {"count": 995, "unit": "task", "resources": ["third_party/ToolHop"]},
+    "apibank": {"count": 1307, "unit": "decision_point", "resources": ["third_party/DAMO-ConvAI", "experiments/jev_bench/data/API-Bank", "paraphrase-MiniLM-L3-v2"]},
+    "toolsandbox": {"count": 1032, "unit": "scenario", "resources": ["third_party/ToolSandbox"], "project_adapter": "experiments/jev_bench/src/jev_bench/benchmarks/toolsandbox_currency.py"},
+    "stabletoolbench": {"count": 765, "unit": "query", "resources": ["third_party/StableToolBench", "experiments/jev_bench/data/StableToolBench"]}
+  }
+}

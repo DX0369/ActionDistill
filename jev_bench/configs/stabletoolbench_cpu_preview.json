@@ -1,0 +1,63 @@
+{
+  "benchmark": {
+    "name": "stabletoolbench",
+    "path": "third_party/StableToolBench",
+    "commit": "aa4ed9f4737ad98bd706663f01d63623c3427812"
+  },
+  "output_root": "tmp",
+  "task_ids": {
+    "G1_instruction": [
+      "25658"
+    ],
+    "G1_category": [
+      "28"
+    ],
+    "G1_tool": [
+      "394"
+    ],
+    "G2_instruction": [
+      "1643"
+    ],
+    "G2_category": [
+      "43"
+    ],
+    "G3_instruction": [
+      "455"
+    ]
+  },
+  "trials": 1,
+  "seed": 20261015,
+  "executors": {
+    "qwen4b": {
+      "base_url": "http://127.0.0.1:8001/v1",
+      "model": "qwen3-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    }
+  },
+  "advisors": {},
+  "conditions": {
+    "native": {
+      "executor": "qwen4b",
+      "advice": "none"
+    }
+  },
+  "comparisons": [],
+  "protocol": {
+    "mode": "cpu_only",
+    "cache_archive": "/data/wangsq/code/ActionDistill/experiments/jev_bench/data/StableToolBench/server_cache.zip"
+  }
+}

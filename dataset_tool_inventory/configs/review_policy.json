@@ -1,0 +1,646 @@
+{
+  "seed": 20261014,
+  "length_sample_size": 1000,
+  "history_reasoning": "删除独立 reasoning/thinking/<think>，保留显式 think 工具及参数（用户确认）",
+  "qwen_parameter_basis": "total >=28B; only explicitly mapped Qwen3.6/3.8",
+  "quantization_policy": "允许官方 FP8；其他量化不自动纳入",
+  "release_policy": "非中国模型约近一年；中国模型2026年；已确认精确白名单视为满足时间要求",
+  "inferred_candidates": "无声明的 harness 类数据集用 H 级：同一（harness, 领域）在整个数据集中被至少 harness_tool_min_trajectories 条轨迹调用过的工具，加上本轨迹此前调用过的其他工具；不使用本轨迹当前或之后的调用。有条件候选（用户确认 2026-10-14）",
+  "harness_tool_min_trajectories": 3,
+  "tool_output_truncation": {
+    "head_tokens": 2048,
+    "tail_tokens": 2048,
+    "note": "用户确认 2026-10-14：图片块（image/input_image/image_url）替换为 [image omitted]；每条工具输出和历史中每次工具调用的参数保留前后各 2048 token（decider-0.8b tokenizer），中间替换为省略标记；截断后整段历史仍超过 32768 时，从最早的中间轮次开始丢弃"
+  },
+  "models": {
+    "gpt-5": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-5.1": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-5.2": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-5.2-2025-12-11": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-5.5": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "openai/gpt-5.5": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-5.6": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-5.6-sol": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-6-sol": {
+      "canonical": "GPT-6.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-6-luna": {
+      "canonical": "GPT-6.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gpt-6-astra": {
+      "canonical": "GPT-6.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-fable-5": {
+      "canonical": "Claude Fable 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "fable-5": {
+      "canonical": "Claude Fable 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-fable5": {
+      "canonical": "Claude Fable 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-opus-4-5": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-opus-4-6": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-opus-4-7": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-opus-4-8": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-opus-5": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-sonnet-4-5": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "claude-haiku-4-5": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "Claude Opus 4.6": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "deepseek-v4-pro": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "deepseek/deepseek-v4-pro": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "DeepSeek-V4-Flash-0731": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "deepseek-v4-flash": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "deepseek-v4.1-flash": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "moonshotai/Kimi-K2.5": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "Kimi-K2.5": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "kimi-k2.5": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "moonshotai/kimi-k2.6-20260420": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "moonshotai/kimi-k3": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "kimi-k3": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "openrouter/moonshotai/kimi-k3": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "zai-org/GLM-5.1-FP8": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "GLM-5.1": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "z-ai/glm-5.2": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "GLM-5.2": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "glm-5.3-flash": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "accounts/fireworks/models/glm-5p3-flash": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "gemini-3-pro-preview": {
+      "canonical": "Gemini 3.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gemini-3.1-pro": {
+      "canonical": "Gemini 3.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "gemini-3-flash-preview": {
+      "canonical": "Gemini 3.x",
+      "approved": true,
+      "release_basis": "用户确认白名单精确型号视为满足时间要求；未独立联网核实"
+    },
+    "minimax/minimax-m3-20260531": {
+      "canonical": "MiniMax M2.5 / M3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "minimax-m3": {
+      "canonical": "MiniMax M2.5 / M3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "MiniMax-M2.5": {
+      "canonical": "MiniMax M2.5 / M3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "minimax-m2.5": {
+      "canonical": "MiniMax M2.5 / M3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "mimo-v2.5-pro": {
+      "canonical": "MiMo-V2.5-Pro",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "Qwen/Qwen3.6-35B-A3B": {
+      "canonical": "Qwen/Qwen3.6-35B-A3B",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）",
+      "total_parameters_b": 35
+    },
+    "DeepSeek-V3.2": {
+      "canonical": "DeepSeek-V3.2",
+      "approved": false,
+      "reason": "不在用户已确认教师范围，或不是教师生成内容"
+    },
+    "deepseek-v3.2": {
+      "canonical": "deepseek-v3.2",
+      "approved": false,
+      "reason": "不在用户已确认教师范围，或不是教师生成内容"
+    },
+    "Qwen/Qwen3.5-35B-A3B": {
+      "canonical": "Qwen/Qwen3.5-35B-A3B",
+      "approved": false,
+      "reason": "不在用户已确认教师范围，或不是教师生成内容"
+    },
+    "<synthetic>": {
+      "canonical": "<synthetic>",
+      "approved": false,
+      "reason": "不在用户已确认教师范围，或不是教师生成内容"
+    },
+    "gpt-4.1": {
+      "canonical": "gpt-4.1",
+      "approved": false,
+      "reason": "不在用户已确认教师范围，或不是教师生成内容"
+    },
+    "Azure/gpt-4.1": {
+      "canonical": "Azure/gpt-4.1",
+      "approved": false,
+      "reason": "不在用户已确认教师范围，或不是教师生成内容"
+    },
+    "openai/Azure/gpt-4.1": {
+      "canonical": "openai/Azure/gpt-4.1",
+      "approved": false,
+      "reason": "不在用户已确认教师范围，或不是教师生成内容"
+    },
+    "gpt-5.4": {
+      "canonical": "gpt-5.4",
+      "approved": true,
+      "release_basis": "用户确认的白名单范围；本轮本地原始字段精确型号已观察"
+    },
+    "claude-fable-5-1": {
+      "canonical": "claude-fable-5-1",
+      "approved": true,
+      "release_basis": "用户确认的白名单范围；本轮本地原始字段精确型号已观察"
+    },
+    "claude-opus-4-8-thinking": {
+      "canonical": "claude-opus-4-8-thinking",
+      "approved": true,
+      "release_basis": "用户确认的白名单范围；本轮本地原始字段精确型号已观察"
+    },
+    "accounts/fireworks/models/deepseek-v4p1-flash": {
+      "canonical": "accounts/fireworks/models/deepseek-v4p1-flash",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "trace-status": {
+      "canonical": "trace-status",
+      "approved": false,
+      "reason": "状态记录标签，非教师模型"
+    },
+    "claude-4.5-opus_1": {
+      "canonical": "claude-4.5-opus",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "claude-4.5-opus_2": {
+      "canonical": "claude-4.5-opus",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "claude-4.5-sonnet-0929_1": {
+      "canonical": "claude-4.5-sonnet-0929",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "claude-4.5-sonnet-0929_2": {
+      "canonical": "claude-4.5-sonnet-0929",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "claude-4.5-haiku-1001_1": {
+      "canonical": "claude-4.5-haiku-1001",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "claude-4.5-haiku-1001_2": {
+      "canonical": "claude-4.5-haiku-1001",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gemini-3-pro-preview_1": {
+      "canonical": "gemini-3-pro-preview",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gemini-3-pro-preview_2": {
+      "canonical": "gemini-3-pro-preview",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5_1": {
+      "canonical": "gpt-5",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5_2": {
+      "canonical": "gpt-5",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5-high_1": {
+      "canonical": "gpt-5-high",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5-high_2": {
+      "canonical": "gpt-5-high",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5-mini_1": {
+      "canonical": "gpt-5-mini",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5-mini_2": {
+      "canonical": "gpt-5-mini",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5.1_1": {
+      "canonical": "gpt-5.1",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "gpt-5.1_2": {
+      "canonical": "gpt-5.1",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核",
+      "identity_basis": "Toolathlon modelname_run exact experiment label; conditional"
+    },
+    "claude-sonnet-4-6": {
+      "canonical": "Claude Sonnet 4.6",
+      "approved": true,
+      "release_basis": "用户确认的 Sonnet 4.5+；本轮记录中精确原始型号"
+    },
+    "Qwen/Qwen3.6-4B": {
+      "canonical": "Qwen/Qwen3.6-4B",
+      "approved": false,
+      "total_parameters_b": 4,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "Qwen/Qwen3.6-8B": {
+      "canonical": "Qwen/Qwen3.6-8B",
+      "approved": false,
+      "total_parameters_b": 8,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "Qwen/Qwen3.6-9B": {
+      "canonical": "Qwen/Qwen3.6-9B",
+      "approved": false,
+      "total_parameters_b": 9,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "Qwen/Qwen3.6-27B": {
+      "canonical": "Qwen/Qwen3.6-27B",
+      "approved": false,
+      "total_parameters_b": 27,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "Qwen/Qwen3.8-4B": {
+      "canonical": "Qwen/Qwen3.8-4B",
+      "approved": false,
+      "total_parameters_b": 4,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "Qwen/Qwen3.8-8B": {
+      "canonical": "Qwen/Qwen3.8-8B",
+      "approved": false,
+      "total_parameters_b": 8,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "Qwen/Qwen3.8-9B": {
+      "canonical": "Qwen/Qwen3.8-9B",
+      "approved": false,
+      "total_parameters_b": 9,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "Qwen/Qwen3.8-27B": {
+      "canonical": "Qwen/Qwen3.8-27B",
+      "approved": false,
+      "total_parameters_b": 27,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "SapientAI-Agent-Opus-5": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "用户确认按数据卡映射为 Claude Opus 5；原始串是 agent 框架名"
+    },
+    "Qwen3.6-35B-A3B": {
+      "canonical": "Qwen/Qwen3.6-35B-A3B",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "gw/Qwen3.6-35B-A3B": {
+      "canonical": "Qwen/Qwen3.6-35B-A3B",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "vllm--Qwen3.6-35B-A3B-0712": {
+      "canonical": "Qwen/Qwen3.6-35B-A3B",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "qwen3.8-max": {
+      "canonical": "Qwen3.8-Max",
+      "approved": true,
+      "release_basis": "用户确认纳入；Qwen3.8 旗舰 2026-08 发布"
+    },
+    "qwen-3.8-max": {
+      "canonical": "Qwen3.8-Max",
+      "approved": true,
+      "release_basis": "用户确认纳入；Qwen3.8 旗舰 2026-08 发布"
+    },
+    "DeepSeek-V4.1-Flash-a": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）；\"-a\" 后缀含义未说明"
+    },
+    "deepseek-v4-flash-0731": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "GLM-5.3-Flash": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "kimi-k2.7-code-highspeed": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "白名单系列 Kimi K2.5+；K2.7 介于 K2.6（2026-04）与 K3（2026-07）之间，按 2026 年发布处理"
+    },
+    "vllm--Qwen3.8-27B": {
+      "canonical": "Qwen/Qwen3.8-27B",
+      "approved": false,
+      "reason": "Qwen 总参数量低于用户确认的 28B 门槛"
+    },
+    "claude-4.5-haiku-1001_3": {
+      "canonical": "claude-4.5-haiku-1001",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "claude-4.5-opus_3": {
+      "canonical": "claude-4.5-opus",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "claude-4.5-sonnet-0929_3": {
+      "canonical": "claude-4.5-sonnet-0929",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "gemini-3-pro-preview_3": {
+      "canonical": "gemini-3-pro-preview",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "gpt-5-high_3": {
+      "canonical": "gpt-5-high",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "gpt-5-mini_3": {
+      "canonical": "gpt-5-mini",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "gpt-5.1_3": {
+      "canonical": "gpt-5.1",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "gpt-5_3": {
+      "canonical": "gpt-5",
+      "approved": true,
+      "release_basis": "用户确认的模型范围；本数据实验标签，API型号仍待核"
+    },
+    "glm-5.2": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "GLM-5": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "GLM-5-Turbo": {
+      "canonical": "GLM 5.x",
+      "approved": true,
+      "release_basis": "GLM-5 系列变体，按 2026 年发布处理"
+    },
+    "Kimi K2.5": {
+      "canonical": "Kimi K2.5+ / K3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "MiniMax M2.5": {
+      "canonical": "MiniMax M2.5 / M3",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "Gemini 3.1 Pro": {
+      "canonical": "Gemini 3.x",
+      "approved": true,
+      "release_basis": "白名单 Gemini 3.x"
+    },
+    "claude-opus-5-5": {
+      "canonical": "Claude 4.5+ / 5",
+      "approved": true,
+      "release_basis": "白名单 Claude 5 系列"
+    },
+    "deepseek/deepseek-v4.1-flash": {
+      "canonical": "DeepSeek V4",
+      "approved": true,
+      "release_basis": "2026 年发布，2026-10-14 联网核实（官方发布记录/公告）"
+    },
+    "google/gemini-3.8-flash": {
+      "canonical": "Gemini 3.x",
+      "approved": true,
+      "release_basis": "白名单 Gemini 3.x Flash"
+    },
+    "gpt-5.6-terra": {
+      "canonical": "GPT-5.x",
+      "approved": true,
+      "release_basis": "白名单 GPT-5.x"
+    },
+    "x-ai/grok-4.5": {
+      "canonical": "Grok 4.5/4.6",
+      "approved": true,
+      "release_basis": "用户 2026-10-14 确认纳入"
+    },
+    "x-ai/grok-4.6": {
+      "canonical": "Grok 4.5/4.6",
+      "approved": true,
+      "release_basis": "用户 2026-10-14 确认纳入"
+    },
+    "tencent/hy3:free": {
+      "canonical": "Hunyuan 3",
+      "approved": true,
+      "release_basis": "用户 2026-10-14 确认纳入"
+    },
+    "intern-s2-preview-397b": {
+      "canonical": "intern-s2-preview-397b",
+      "approved": false,
+      "reason": "用户 2026-10-14 确认不纳入"
+    },
+    "super_nova_ext": {
+      "canonical": "super_nova_ext",
+      "approved": false,
+      "reason": "用户 2026-10-14 确认不纳入"
+    }
+  },
+  "tau2_retail_test": {
+    "split": "third_party/tau2-bench-verified/data/tau2/domains/retail/split_tasks.json",
+    "tasks": "third_party/tau2-bench-verified/data/tau2/domains/retail/tasks.json"
+  }
+}

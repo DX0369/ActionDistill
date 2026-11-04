@@ -1,0 +1,51 @@
+{
+  "benchmark": {
+    "name": "toolhop",
+    "path": "third_party/ToolHop",
+    "commit": "b439d7279af359fda46e8117ae4f0245b75f5c6b"
+  },
+  "output_root": "tmp",
+  "task_ids": {
+    "tasks": [
+      "0",
+      "44"
+    ]
+  },
+  "trials": 1,
+  "seed": 20261015,
+  "executors": {
+    "qwen3_4b": {
+      "base_url": "http://127.0.0.1:8001/v1",
+      "model": "qwen3-4b",
+      "model_path": "/data/wangsq/model/Qwen3-4B",
+      "timeout_seconds": 600,
+      "max_tokens": 8192,
+      "max_model_len": 131072,
+      "yarn": {
+        "rope_type": "yarn",
+        "factor": 4.0,
+        "original_max_position_embeddings": 32768
+      },
+      "thinking": {
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "top_k": 20,
+        "min_p": 0
+      }
+    }
+  },
+  "advisors": {},
+  "conditions": {
+    "pa_tool": {
+      "executor": "qwen3_4b",
+      "advice": "none",
+      "pa_tool_mapping": "/data/wangsq/code/ActionDistill/experiments/jev_bench/outputs/pa_tool_prepare_toolhop_REPLACE_ME/mapping.json"
+    }
+  },
+  "comparisons": [],
+  "protocol": {
+    "mode": "smoke",
+    "scenario": "Free",
+    "max_turns": 9
+  }
+}

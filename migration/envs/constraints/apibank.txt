@@ -1,0 +1,15 @@
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
+numpy==1.26.4
+sentence-transformers==2.2.2
+transformers==4.41.2
+tokenizers==0.19.1
+huggingface-hub==0.23.4
+requests==2.25.1
+tqdm==4.64.1
+nltk==3.6.5
+googletrans==3.1.0a0
+httpx==0.13.3
+rouge==1.0.1
+rank-bm25==0.2.2
+tenacity==8.5.0

@@ -1,0 +1,15 @@
+torch
+torchvision
+numpy
+sentence-transformers
+transformers
+tokenizers
+huggingface-hub
+requests
+tqdm
+nltk
+googletrans
+httpx
+rouge
+rank-bm25
+tenacity

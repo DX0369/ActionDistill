@@ -1,0 +1,28 @@
+{
+  "task_only_datasets": ["mle-trajectories"],
+  "source_task_ids": {
+    "mle-trajectories": {
+      "path_pattern": "(?:.*/)?trials/[^/]+/(?P<competition>[^/]+)/agent/trajectory\\.json",
+      "prefix": "mle:"
+    }
+  },
+  "namespaces": {
+    "WildClawBench-Trajectories": "wildclawbench",
+    "unified-agent-trajectories": "wildclawbench",
+    "Open-SWE-Traces": "swe",
+    "swe-rebench-v2-glm-5.1-pi-traces": "swe"
+  },
+  "swe_datasets": [
+    "Open-SWE-Traces",
+    "swe-rebench-v2-glm-5.1-pi-traces"
+  ],
+  "swe_repo_dataset": "Open-SWE-Traces",
+  "swe_id_rule": "Open-SWE validate canonical repo against owner_repo_prN or owner__repo-N; GLM parse owner__repo-N; positive PR number, case-insensitive GitHub owner/repo; group as swe_pr:owner__repo-N. Never use linked issue number.",
+  "evidence": [
+    "https://arxiv.org/html/2602.09892v2#A2",
+    "https://raw.githubusercontent.com/SWE-rebench/SWE-rebench-V2/main/sample.json",
+    "https://huggingface.co/datasets/nebius/SWE-rebench-V2-PRs",
+    "https://github.com/yt-project/unyt/pull/211",
+    "https://docs.github.com/en/rest/repos/contents"
+  ]
+}
