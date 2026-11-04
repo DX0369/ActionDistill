@@ -1,6 +1,6 @@
 # Jev 标准 benchmark 评测
 
-更新时间：2026-11-04 14:24 CST +0800。
+更新时间：2026-11-04 16:12 CST +0800。
 
 ## 研究目标
 
@@ -21,7 +21,7 @@
 | 资产 | 固定来源／环境 |
 | --- | --- |
 | BFCL | `third_party/gorilla/berkeley-function-call-leaderboard`，`6ea57973c7a6097fd7c5915698c54c17c5b1b6c8`；`trust` |
-| τ² Verified | `third_party/tau2-bench-verified`，本地`3d82db8f3579efe29609ab9daff058a9b7cb187c`，含未推送retail属性修复；`llm-efficiency` |
+| τ² Verified | `third_party/tau2-bench-verified`，[DX0369/tau2-bench-verified](https://github.com/DX0369/tau2-bench-verified)固定`3d82db8f3579efe29609ab9daff058a9b7cb187c`，含已发布retail属性修复；`llm-efficiency` |
 | ToolSandbox | `third_party/ToolSandbox`，`c8571d7854316d2e1c5f288e59fe1e34e53f6dd1`；`jev-toolsandbox` |
 | API-Bank | `third_party/DAMO-ConvAI/api-bank`，父仓`faf754671f5b850e1b4d1ff870db37a6a2480df6`；`data/API-Bank/test-data/`；`trust`生成、`jev-apibank`评分 |
 | MiniLM检索器 | `/data/wangsq/model/paraphrase-MiniLM-L3-v2`；评分环境保留Torch2.2.2、SentenceTransformers2.2.2与旧googletrans/httpx |

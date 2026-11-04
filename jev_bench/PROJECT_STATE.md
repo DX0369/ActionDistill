@@ -1,6 +1,6 @@
 # Jev benchmark 项目状态
 
-更新时间：2026-11-04 14:34 CST +0800。
+更新时间：2026-11-04 16:17 CST +0800。
 
 ## 当前阶段
 
@@ -8,11 +8,13 @@
 
 四项阶段性正式配置已准备：`configs/bfcl_mt_baselines_formal.json`、`configs/tau2_baselines_formal.json`、`configs/toolhop_baselines_formal.json`、`configs/apibank_baselines_formal.json`。条件依原序为Native、官方Jev、ActionOPD、DeepSeek建议器、STAR，comparisons空；每条件800/278/995题及1307决策点，五条件计划4000/1390/4975 episodes及6535点。PA仍属完整主表，待从零完整mapping；这些只是全量预览，未执行正式生成/评测，本轮不查端口或分配GPU。
 
-迁移本地入口齐备：环境候选约束/安装、服务命令、目标机配置、tokenizer-only CPU renderer、Ours门控/top3、PA显式解释器和公开GitHub/私有ModelScope发布流程。唯一操作顺序见[迁移说明](../migration/README.md)。目标机尚未安装验证，新机OS/A100显存/驱动/CUDA12.8 SDK、CUDA扩展及目标机真实smoke仍待核对；候选约束不是已求解环境锁。完整训练池已在本机导出并验收，ModelScope尚未上传；本地主线清理、干净初始提交和CPU验收已完成；GitHub推送因本机缺少HTTPS认证尚未成功。认证后仅推送本地`mainline`到远端`main`，旧开发历史不随发布。
+迁移本地入口齐备：环境候选约束/安装、服务命令、目标机配置、tokenizer-only CPU renderer、Ours门控/top3、PA显式解释器和公开GitHub/私有ModelScope发布流程。唯一操作顺序见[迁移说明](../migration/README.md)。目标机尚未安装验证，新机OS/A100显存/驱动/CUDA12.8 SDK、CUDA扩展及目标机真实smoke仍待核对；候选约束不是已求解环境锁。完整训练池已在本机导出并验收，ModelScope尚未上传；本地主线清理、干净初始提交和CPU验收已完成；GitHub主线初始提交`43c2b44`已发布到远端`main`，旧开发历史未发布。本轮fork迁移改动已在本地验证，待同步至GitHub。
 
-当前τ² source bundle为 `outputs/migration_sources_20261104_011846/tau2-bench-verified.bundle`，44,416,177 bytes、固定3d82db8；六个第三方Git版本、三套HF数据metadata与必要文件已只读核对。source-download只取固定τ²包、不依赖完整池；运行相关dirty/身份合同不放宽。训练池、v2已交付38k但未训练的状态统一见[Jev状态](../jev_train/PROJECT_STATE.md)，不在本页维护第二份训练计划。
+τ²修复已发布至 `https://github.com/DX0369/tau2-bench-verified` 的 `actiondistill-retail-item-fix` 分支，远端指向固定提交 `3d82db8f3579efe29609ab9daff058a9b7cb187c`。迁移配置保持同一提交，从fork直接恢复；ModelScope只交付训练数据包，不再承担源码交付。原有HEAD/runtime dirty检查保持不变。训练池、v2已交付38k但未训练的状态统一见[Jev状态](../jev_train/PROJECT_STATE.md)，不在本页维护第二份训练计划。
 
 2026-11-04 14:30 CST +0800，两处差分oracle改为自包含请求合同，保留七类建议/门控场景、重复调用不累积建议、历史不变，以及Qwen/STAR的采样和可选工具字段验证。共享CPU回归168项通过；初次两项失败分别为本机Git不支持新init参数和沙箱loopback权限，修正测试命令、在允许本机端口的环境定向复验后通过。第三方固定版本检查通过；未调用外部模型、运行正式评测或改写旧结果。
+
+2026-11-04 16:17 CST +0800，源码与数据交付分开：τ²直接从GitHub fork恢复原3d82db8提交，ModelScope源码上传/下载入口已退役；数据下载仅取冻结包12个文件，并保留私有可见性、固定revision及完整池校验。13项迁移CPU回归、生成Git命令的临时本地恢复及HEAD/runtime dirty检查、现有资产检查、CLI参数和文档语法检查通过。已联网核对fork分支SHA；未下载模型、调用模型API、运行训练或正式评测。
 
 ## 当前资产与CPU验证
 

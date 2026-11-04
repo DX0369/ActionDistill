@@ -1,12 +1,12 @@
 # ActionDistill 迁移与运行
 
-更新时间：2026-11-04 14:24 CST +0800。
+更新时间：2026-11-04 16:12 CST +0800。
 
-本页是唯一迁移说明，覆盖旧机交付和新机运行。工作区布局为 `ActionDistill/experiments/` 代码仓库，旁边按 [assets.json](assets.json) 恢复固定版本的 `third_party/`，第三方源码不复制进公开仓库；下载模型、数据和实验输出独立管理。代码发布到公开 `DX0369/ActionDistill`，整理数据发布到私有 `dx0369/ActionDistill`。
+本页是唯一迁移说明，覆盖旧机交付和新机运行。工作区布局为 `ActionDistill/experiments/` 代码仓库，旁边按 [assets.json](assets.json) 恢复固定版本的 `third_party/`，第三方源码独立管理，不复制进ActionDistill主仓库；下载模型、数据和实验输出独立管理。代码发布到公开 `DX0369/ActionDistill`，整理数据发布到私有 `dx0369/ActionDistill`。
 
 | 使用路线 | 入口 |
 |---|---|
-| 旧机交付 | [资源与源码包](#代码与正式测评资源)、[冻结训练池](#冻结训练检查点)、[发布](#发布与目标机下载) |
+| 旧机交付 | [代码与测评资源](#代码与正式测评资源)、[冻结训练池](#冻结训练检查点)、[发布](#发布与目标机下载) |
 | 新机只测五基线 | [公共准备](#新机公共准备) → [基线测评](#一基线测评) |
 | 训练Jev | 公共准备 → [选样、双卡训练与校准](#二训练-jev) |
 | Ours已准备好 | 公共准备 → [服务](#服务部署配置和建议策略) → [联合测评](#三ours-联合测评) |
@@ -43,18 +43,7 @@ cd /data/wangsq/code/ActionDistill
 python -B experiments/migration/prepare.py --workspace-root "$PWD" --check
 ```
 
-清单中的版本检查沿用正式执行器的 HEAD、runtime dirty 和 ToolHop metadata 规则。τ² 修复是本地 commit，不能用重新应用 patch 后产生的其他 commit 替代。
-
-下面仅**打印**创建 bundle 的命令，不创建文件：
-
-```bash
-python -B experiments/migration/prepare.py \
-  --workspace-root "$PWD" \
-  --package-root "$PWD/experiments/jev_bench/outputs/migration_package" \
-  --stage tau-bundle
-```
-
-固定修复通过 `tau2-bench-verified.bundle` 交付。已有包为 `jev_bench/outputs/migration_sources_20261104_011846/tau2-bench-verified.bundle`，44,416,177 bytes，保留 `3d82db8f3579efe29609ab9daff058a9b7cb187c`；可以直接发布。官方可下载资源按固定版本恢复，原始教师轨迹留在旧机。
+清单中的版本检查沿用正式执行器的 HEAD、runtime dirty 和 ToolHop metadata 规则。τ² 从 [DX0369/tau2-bench-verified](https://github.com/DX0369/tau2-bench-verified) 恢复，固定提交 `3d82db8f3579efe29609ab9daff058a9b7cb187c` 已包含 retail 商品查找修复。所有源码统一从 GitHub 拉取固定提交；原始教师轨迹留在旧机。
 
 `prepare.py` 的 `sources`、`benchmarks`、`models` 可分别打印；Git目标目录须不存在，HF CLI保留版本metadata并支持续传。共享下载模型使用显式模型根目录，本机为 `/data/wangsq/model/`；自训Jev跟随run保存。
 
@@ -113,30 +102,29 @@ cd /data/wangsq/code/ActionDistill/experiments
 GIT_TERMINAL_PROMPT=1 git push --set-upstream origin mainline:refs/heads/main
 ```
 
-数据上传使用 `modelscope==1.34.0` 的解释器，通过环境变量 `MODELSCOPE_API_TOKEN` 认证，命令和 URL 不含 token。入口要求远端仓库已经存在且为私有，不自动创建或修改可见性。上传前仍须按来源确认再分发许可；私有设置不替代许可判断。
+数据上传使用 `modelscope==1.34.0` 的解释器，通过环境变量 `MODELSCOPE_API_TOKEN` 认证，命令和 URL 不含 token。入口要求远端仓库已经存在且为私有，不自动创建或修改可见性。本次按已确定范围私有迁移，不再增加来源审批步骤；数据包保留原有来源信息和上游使用条件。
 
 ```bash
 cd /data/wangsq/code/ActionDistill
-JEV_PUBLISH_PYTHON=/data/wangsq/software/miniconda3/bin/python # 本机已核对modelscope==1.34.0
-JEV_POOL_OUT=experiments/jev_train/outputs/selection_pool_20261104_124748
-read -r -s -p 'ModelScope token: ' MODELSCOPE_API_TOKEN
-printf '\n'
-export MODELSCOPE_API_TOKEN
-"$JEV_PUBLISH_PYTHON" -B experiments/migration/publish.py --stage sources \
-  --source-package experiments/jev_bench/outputs/migration_sources_20261104_011846 --execute
-"$JEV_PUBLISH_PYTHON" -B experiments/migration/publish.py --stage check-data \
-  --pool "${JEV_POOL_OUT:?填写已验收完整池}"
-"$JEV_PUBLISH_PYTHON" -B experiments/migration/publish.py --stage data --pool "$JEV_POOL_OUT" --execute
-unset MODELSCOPE_API_TOKEN
+(
+  set -e
+  JEV_PUBLISH_PYTHON=/data/wangsq/software/miniconda3/bin/python # modelscope==1.34.0
+  JEV_POOL_OUT=experiments/jev_train/outputs/selection_pool_20261104_124748
+  read -r -s -p 'ModelScope token: ' MODELSCOPE_API_TOKEN
+  printf '\n'
+  export MODELSCOPE_API_TOKEN
+  setsid --wait "$JEV_PUBLISH_PYTHON" -B -u experiments/migration/publish.py \
+    --stage data --dataset-id dx0369/ActionDistill --pool "$JEV_POOL_OUT" --execute
+)
 ```
 
-池发布仅接受 completed、非 smoke 的150,234条包，并要求38k逐条一致、三档黄金重放及文件内容验证通过。只上传 manifest 列出的文件和两份 metadata，不上传原始149GB轨迹、缓存或旧输出。source bundle 可先单独发布，后续上传训练池不会移除它；最终记录两者均已包含的 revision。
+池发布仅接受 completed、非 smoke 的150,234条包，并要求38k逐条一致、三档黄金重放及文件内容验证通过。上传前自动执行文件内容校验，只上传manifest列出的数据文件和两份metadata，不上传原始149GB轨迹、缓存或旧输出。记录最终40位revision；新机下载仅包含这份数据包，不依赖源码附件。
 
 ## 新机公共准备
 
 ### 路径、源码与下载
 
-公共准备采用覆盖训练与六项测评的完整环境。先填写已有 Python ≥3.10、Conda 和 CUDA 12.8 SDK 的绝对路径，以及发布后返回的 ModelScope 源码包 revision。代码目录固定放在工作区的 `experiments/`；模型根目录可自行指定。
+公共准备采用覆盖训练与六项测评的完整环境。先填写已有 Python ≥3.10、Conda 和 CUDA 12.8 SDK 的绝对路径；源码恢复不需要ModelScope token或数据包revision。代码目录固定放在工作区的 `experiments/`；模型根目录可自行指定。
 
 ```bash
 export JEV_WORKSPACE_ROOT="$HOME/code/ActionDistill"
@@ -147,7 +135,6 @@ export JEV_TRAIN_PREFIX="$JEV_ENVS_ROOT/actiondistill-train"
 : "${JEV_BOOTSTRAP_PYTHON:?填写已有Python的绝对路径}"
 : "${JEV_CONDA_EXE:?填写conda可执行文件的绝对路径}"
 : "${JEV_CUDA_HOME:?填写CUDA12.8 SDK的绝对路径}"
-: "${JEV_SOURCE_REVISION:?填写含tau2 bundle的40位ModelScope revision}"
 
 mkdir -p "$JEV_WORKSPACE_ROOT"
 git clone https://github.com/DX0369/ActionDistill.git "$JEV_WORKSPACE_ROOT/experiments"
@@ -157,17 +144,8 @@ export JEV_BOOTSTRAP="$JEV_WORKSPACE_ROOT/experiments/jev_bench/tmp/download_boo
 "$JEV_BOOTSTRAP/bin/python" -m pip install 'huggingface_hub==1.33.0' 'modelscope==1.34.0'
 export PATH="$JEV_BOOTSTRAP/bin:$PATH"
 
-read -r -s -p 'ModelScope token: ' MODELSCOPE_API_TOKEN
-printf '\n'
-export MODELSCOPE_API_TOKEN
-"$JEV_BOOTSTRAP/bin/python" -B experiments/migration/publish.py --stage sources-download \
-  --revision "$JEV_SOURCE_REVISION" \
-  --destination "$JEV_WORKSPACE_ROOT/data/migration_sources" --execute
-unset MODELSCOPE_API_TOKEN
-
 "$JEV_BOOTSTRAP/bin/python" -B experiments/migration/prepare.py \
-  --workspace-root "$JEV_WORKSPACE_ROOT" --model-root "$JEV_MODEL_ROOT" \
-  --package-root "$JEV_WORKSPACE_ROOT/data/migration_sources" --stage all
+  --workspace-root "$JEV_WORKSPACE_ROOT" --model-root "$JEV_MODEL_ROOT" --stage all
 ```
 
 ## 环境重建
@@ -302,7 +280,7 @@ setsid --wait env LITELLM_LOCAL_MODEL_COST_MAP=True \
 
 ### 便携配比与训练
 
-完整池 revision 应同时包含验收通过的数据包和 τ² bundle。仅做 benchmark 不需要执行本节。下载工具沿用公共准备中的 bootstrap 环境。
+完整池revision只包含验收通过的数据包，τ²修复源码从GitHub固定提交恢复。仅做benchmark不需要执行本节。下载工具沿用公共准备中的 bootstrap 环境。
 
 ```bash
 cd "$JEV_WORKSPACE_ROOT"

@@ -41,26 +41,15 @@ def hf_command(asset, root, dataset=False):
     return command(*args)
 
 
-def plan(assets, workspace, models, package, stage):
+def plan(assets, workspace, models, stage):
     lines = ['#!/usr/bin/env bash', 'set -euo pipefail']
-    if stage == 'tau-bundle':
-        path = package/'tau2-bench-verified.bundle'
-        lines += [command('mkdir', '-p', package), command('test', '!', '-e', path),
-                  command('git', '-C', workspace/'third_party/tau2-bench-verified', 'bundle', 'create',
-                          path, 'refs/heads/actiondistill-retail-item-fix')]
-        return lines
     if stage in ('sources', 'all'):
         lines.append(command('mkdir', '-p', workspace/'third_party'))
         for asset in assets['git_checkouts']:
             target = workspace/asset['path']
             lines.append(command('test', '!', '-e', target))
-            if 'bundle' in asset:
-                lines.append(command('git', 'clone', '--branch', asset['bundle_branch'], '--no-checkout',
-                                     package/asset['bundle'], target))
-                lines.append(command('git', '-C', target, 'remote', 'set-url', 'origin', asset['source']))
-            else:
-                lines.append(command('git', 'clone', '--filter=blob:none', '--no-checkout', asset['source'], target))
-                lines.append(command('git', '-C', target, 'fetch', 'origin', asset['revision']))
+            lines.append(command('git', 'clone', '--filter=blob:none', '--no-checkout', asset['source'], target))
+            lines.append(command('git', '-C', target, 'fetch', 'origin', asset['revision']))
             lines.append(command('git', '-C', target, 'checkout', '--detach', asset['revision']))
     if stage in ('benchmarks', 'all'):
         lines.extend(hf_command(a, workspace, dataset=True) for a in assets['hf_datasets'])
@@ -110,8 +99,7 @@ def main():
     parser.add_argument('--assets', type=Path, default=Path(__file__).with_name('assets.json'))
     parser.add_argument('--workspace-root', type=Path, required=True)
     parser.add_argument('--model-root', type=Path)
-    parser.add_argument('--package-root', type=Path)
-    parser.add_argument('--stage', choices=('sources', 'benchmarks', 'models', 'tau-bundle', 'all'), default='all')
+    parser.add_argument('--stage', choices=('sources', 'benchmarks', 'models', 'all'), default='all')
     parser.add_argument('--check', action='store_true', help='audit existing source/data assets only')
     args = parser.parse_args()
     assets = validate_assets(json.loads(args.assets.read_text()))
@@ -122,11 +110,8 @@ def main():
         return
     if args.stage in ('all', 'models') and args.model_root is None:
         parser.error('--model-root is required for model download commands')
-    if args.stage in ('all', 'sources', 'tau-bundle') and args.package_root is None:
-        parser.error('--package-root is required for the exact tau2 Git bundle')
     models = args.model_root.resolve() if args.model_root else None
-    package = args.package_root.resolve() if args.package_root else None
-    print('\n'.join(plan(assets, workspace, models, package, args.stage)))
+    print('\n'.join(plan(assets, workspace, models, args.stage)))
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@
   "format": "actiondistill_migration_v1",
   "git_checkouts": [
     {"path": "third_party/gorilla", "source": "https://github.com/ShishirPatil/gorilla.git", "revision": "6ea57973c7a6097fd7c5915698c54c17c5b1b6c8", "required_files": ["berkeley-function-call-leaderboard/bfcl_eval/data", "berkeley-function-call-leaderboard/pyproject.toml"]},
-    {"path": "third_party/tau2-bench-verified", "source": "https://github.com/amazon-agi/tau2-bench-verified.git", "revision": "3d82db8f3579efe29609ab9daff058a9b7cb187c", "bundle": "tau2-bench-verified.bundle", "bundle_branch": "actiondistill-retail-item-fix", "required_files": ["src/tau2/domains/retail/tools.py", "data/tau2/domains", "data/tau2/user_simulator"]},
+    {"path": "third_party/tau2-bench-verified", "source": "https://github.com/DX0369/tau2-bench-verified.git", "revision": "3d82db8f3579efe29609ab9daff058a9b7cb187c", "required_files": ["src/tau2/domains/retail/tools.py", "data/tau2/domains", "data/tau2/user_simulator"]},
     {"path": "third_party/ToolSandbox", "source": "https://github.com/apple-aiml-research/ToolSandbox.git", "revision": "c8571d7854316d2e1c5f288e59fe1e34e53f6dd1", "required_files": ["tool_sandbox/scenarios", "pyproject.toml"]},
     {"path": "third_party/DAMO-ConvAI", "source": "https://github.com/AlibabaResearch/DAMO-ConvAI.git", "revision": "faf754671f5b850e1b4d1ff870db37a6a2480df6", "required_files": ["api-bank/apis", "api-bank/lv3_apis", "api-bank/init_database"]},
     {"path": "third_party/StableToolBench", "source": "https://github.com/THUNLP-MT/StableToolBench.git", "revision": "aa4ed9f4737ad98bd706663f01d63623c3427812", "required_files": ["solvable_queries/test_instruction", "solvable_queries/test_query_ids"]},

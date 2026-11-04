@@ -96,35 +96,15 @@ def publish_data(pool, dataset):
     print('Private dataset:', dataset, 'revision:', upload_revision(api, dataset, result))
 
 
-def checked_source_bundle(package):
-    path = package/'tau2-bench-verified.bundle'
-    assets = json.loads(Path(__file__).with_name('assets.json').read_text())
-    expected = next(a['revision'] for a in assets['git_checkouts'] if a['path'] == 'third_party/tau2-bench-verified')
-    result = subprocess.check_output(['git', 'bundle', 'list-heads', str(path)], text=True)
-    if result.split() != [expected, 'refs/heads/actiondistill-retail-item-fix']:
-        raise ValueError('source bundle differs from the approved fixed tau2 commit')
-    return path
-
-
-def publish_sources(package, dataset):
-    path = checked_source_bundle(package)
-    api, token = private_hub(dataset)
-    result = api.upload_file(repo_id=dataset, repo_type='dataset', path_or_fileobj=str(path),
-                             path_in_repo='tau2-bench-verified.bundle', token=token,
-                             commit_message='Preserve the fixed tau2 source commit for migration')
-    print('Private source bundle:', dataset, 'revision:', upload_revision(api, dataset, result))
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--stage', choices=('code', 'data', 'sources', 'data-download', 'sources-download', 'check-data'), required=True)
+    parser.add_argument('--stage', choices=('code', 'data', 'data-download', 'check-data'), required=True)
     parser.add_argument('--repository', type=Path, default=REPOSITORY)
     parser.add_argument('--github-url', default=GITHUB)
     parser.add_argument('--source-branch', help='explicit local branch to publish; required for the code stage')
     parser.add_argument('--branch', default='main')
     parser.add_argument('--dataset-id', default=DATASET)
     parser.add_argument('--pool', type=Path)
-    parser.add_argument('--source-package', type=Path)
     parser.add_argument('--revision')
     parser.add_argument('--destination', type=Path)
     parser.add_argument('--execute', action='store_true')
@@ -154,14 +134,6 @@ def main():
             print(shlex.join([sys.executable, '-B', str(Path(__file__).resolve()), '--stage', 'code',
                               '--repository', str(args.repository), '--github-url', args.github_url,
                               '--source-branch', args.source_branch, '--branch', args.branch, '--execute']))
-    elif args.stage == 'sources':
-        if args.source_package is None:
-            parser.error('--source-package is required')
-        if args.execute:
-            publish_sources(args.source_package, args.dataset_id)
-        else:
-            print(shlex.join([sys.executable, '-B', str(Path(__file__).resolve()), '--stage', 'sources',
-                              '--source-package', str(args.source_package), '--dataset-id', args.dataset_id, '--execute']))
     elif args.stage in ('data', 'check-data'):
         if args.pool is None:
             parser.error('--pool is required')
@@ -178,19 +150,15 @@ def main():
         if args.destination is None or args.revision is None or not re.fullmatch(r'[0-9a-f]{40}', args.revision):
             parser.error('download requires --destination and an explicit immutable --revision')
         command = ['modelscope', 'download', '--dataset', args.dataset_id, '--revision', args.revision,
-                   '--local_dir', str(args.destination)]
-        if args.stage == 'sources-download':
-            command += ['--include', 'tau2-bench-verified.bundle']
+                   '--local_dir', str(args.destination), '--include',
+                   *sorted(POOL_FILES | {'manifest.json', 'metadata/command.txt', 'metadata/run_status.json'})]
         print(shlex.join(command))
         if args.execute:
             api, _ = private_hub(args.dataset_id)
             checked_revision(api, args.dataset_id, args.revision)
             subprocess.run(command, check=True)
-            if args.stage == 'data-download':
-                completed_pool(args.destination)
-            checked_source_bundle(args.destination)
-            delivered = 'pool and fixed source bundle' if args.stage == 'data-download' else 'fixed source bundle'
-            print('Downloaded', delivered, 'verified at revision:', args.revision)
+            completed_pool(args.destination)
+            print('Downloaded pool verified at revision:', args.revision)
 
 
 if __name__ == '__main__':

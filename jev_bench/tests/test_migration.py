@@ -2,6 +2,7 @@
 import importlib.util
 import io
 import json
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -325,35 +326,53 @@ class MigrationTests(unittest.TestCase):
                     self.assertEqual(set(result['imports']), set(required))
                     self.assertFalse(result['gpu_inference_checked'])
 
-    def test_source_download_does_not_require_a_training_pool(self):
+    def test_source_plan_recovers_tau2_from_the_pinned_github_fork(self):
+        preparation = migration_module('prepare')
+        assets = preparation.validate_assets(json.loads(
+            (PROJECT.parent/'migration/assets.json').read_text()))
+        workspace = Path('/target/workspace')
+        commands = [shlex.split(line) for line in preparation.plan(assets, workspace, None, 'sources')]
+        target = str(workspace/'third_party/tau2-bench-verified')
+        revision = '3d82db8f3579efe29609ab9daff058a9b7cb187c'
+        self.assertIn(['git', 'clone', '--filter=blob:none', '--no-checkout',
+                       'https://github.com/DX0369/tau2-bench-verified.git', target], commands)
+        self.assertIn(['git', '-C', target, 'fetch', 'origin', revision], commands)
+        self.assertIn(['git', '-C', target, 'checkout', '--detach', revision], commands)
+        self.assertFalse(any('modelscope' in command or 'bundle' in command for command in commands))
+
+    def test_data_download_requires_only_the_verified_pool(self):
         publication = migration_module('publish')
         revision = 'a'*40
         api = SimpleNamespace(dataset_info=Mock(return_value=SimpleNamespace(visibility=1, sha=revision)))
+        files = sorted([
+            'README.md', 'manifest.json', 'metadata/command.txt', 'metadata/run_status.json',
+            'pool/train.jsonl', 'pool/annotations.jsonl', 'pool/selection_reference.json',
+            'eval/val.jsonl', 'eval/test_id.jsonl', 'eval/test_ood.jsonl',
+            'selections/task_reply_v2_38k_ids.txt', 'recipes/task_reply_v2_38k.json',
+        ])
         with tempfile.TemporaryDirectory(dir=PROJECT/'tmp') as directory:
             destination = Path(directory)
-            argv = ['publish.py', '--stage', 'sources-download', '--revision', revision,
+            argv = ['publish.py', '--stage', 'data-download', '--revision', revision,
                     '--destination', directory]
             with patch('sys.argv', argv), patch.object(publication, 'private_hub') as hub, \
                  patch.object(publication.subprocess, 'run') as download, redirect_stdout(io.StringIO()):
                 publication.main()
                 hub.assert_not_called()
                 download.assert_not_called()
-            for error in (None, ValueError('bundle differs')):
-                with self.subTest(bundle_error=error), patch('sys.argv', [*argv, '--execute']), \
+            for error in (None, ValueError('pool differs')):
+                with self.subTest(pool_error=error), patch('sys.argv', [*argv, '--execute']), \
                      patch.object(publication, 'private_hub', return_value=(api, 'not-logged')), \
-                     patch.object(publication, 'completed_pool') as pool, \
-                     patch.object(publication, 'checked_source_bundle', side_effect=error) as bundle, \
+                     patch.object(publication, 'completed_pool', side_effect=error) as pool, \
                      patch.object(publication.subprocess, 'run') as download, redirect_stdout(io.StringIO()):
                     if error is None:
                         publication.main()
                     else:
-                        with self.assertRaisesRegex(ValueError, 'bundle differs'):
+                        with self.assertRaisesRegex(ValueError, 'pool differs'):
                             publication.main()
-                    pool.assert_not_called()
-                    bundle.assert_called_once_with(destination)
+                    pool.assert_called_once_with(destination)
                     download.assert_called_once_with(
                         ['modelscope', 'download', '--dataset', publication.DATASET, '--revision', revision,
-                         '--local_dir', directory, '--include', 'tau2-bench-verified.bundle'], check=True)
+                         '--local_dir', directory, '--include', *files], check=True)
 
     def test_smoke_guidance_overrides_preserve_the_six_benchmark_scopes(self):
         deployment = migration_module('deploy')
